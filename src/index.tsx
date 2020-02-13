@@ -10,8 +10,6 @@ import Typography from '@material-ui/core/Typography';
 import Select from '@material-ui/core/Select';
 
 async function run() {
-    //const wasm = await import("../sorting_rust/pkg/sorting");
-
     ReactDOM.render(<App /> , document.getElementById("root"));
 }
 
@@ -84,10 +82,10 @@ function CustomizedSelects() {
   );
 }
 
-
 function App() {
     const [data, setData] = useState(generateRandomArray(10,10));
     const [dataLen, setDataLen] = useState(10);
+    const [wasm, setWasm] = useState();
     const handleSliderChange = (_event: any, newValue: number | number[]) => {
         if (typeof(newValue) === "number") {
             setDataLen(newValue);
@@ -98,6 +96,16 @@ function App() {
         setData(generateRandomArray(dataLen, 10))
     };
     const classes = useStyles();
+    React.useEffect(() => {
+        import("../sorting_rust/pkg/sorting")
+        .then(wasm => {
+            wasm.init()
+            setWasm(wasm)
+        })
+    },[])
+    const tst = () => {
+        wasm_test(wasm, data, setData)
+    }
     return (
           <div className={classes.root}>
             <CssBaseline />
@@ -106,7 +114,11 @@ function App() {
                 <Typography variant="h6" className={classes.title}>
                   Sorting visualization
                 </Typography>
-                <Button color="inherit" className={classes.sort}>Sort</Button>
+                <Button
+                    color="inherit"
+                    className={classes.sort}
+                    onClick={tst}
+                >Sort</Button>
                 <Button
                     color="inherit"
                     className={classes.randomize}
@@ -141,6 +153,33 @@ function App() {
             </main>
           </div>
     )
+}
+
+interface Animation {
+    Swap?: [number, number]
+    Compare?: [number, number]
+}
+
+function wasm_test(wasm: any, data: number[], setData: (n: React.SetStateAction<number[]>) => void) {
+    let myData = data.slice()
+    let arr = Int32Array.from(myData)
+    let animations = wasm.bouble_sort(arr) as Animation[]
+    let timeout = 100;
+    for (let i=0;i<animations.length;i++) {
+        let animation = animations[i];
+        if (typeof(animation.Compare) !== "undefined") {
+            console.log(`Compare ${animation.Compare[0]} and ${animation.Compare[1]}`)
+        } else if (typeof(animation.Swap) !== "undefined") {
+            console.log(`Swap ${animation.Swap[0]} and ${animation.Swap[1]}`)
+            let tmp = myData[animation.Swap[0]]
+            myData[animation.Swap[0]] = myData[animation.Swap[1]]
+            myData[animation.Swap[1]] = tmp
+        }
+        let d = myData.slice()
+        setTimeout(()=>{
+            setData(d)
+        }, timeout * i)
+    }
 }
 
 function generateRandomArray(len: number, max: number): Array<number> {
