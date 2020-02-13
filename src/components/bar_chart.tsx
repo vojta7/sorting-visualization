@@ -11,7 +11,7 @@ const barChartStyles = makeStyles(()=> createStyles(
   }
 ));
 
-export interface BarChartProps { data: Array<number> }
+export interface BarChartProps { data: number[] }
 
 export function BarChart(props: BarChartProps) {
     let classes = barChartStyles();

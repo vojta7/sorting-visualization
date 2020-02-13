@@ -62,7 +62,8 @@ const useStyles = makeStyles(
   }),
 );
 
-export function MainBar() {
+interface MainBarProps { newData: ()=>void }
+export function MainBar(props: MainBarProps) {
   const classes = useStyles();
 
   return (
@@ -76,7 +77,11 @@ export function MainBar() {
               <CustomizedSelects />
           </div>
           <Button color="inherit" className={classes.sort}>Sort</Button>
-          <Button color="inherit" className={classes.randomize}>Randomize</Button>
+          <Button
+              color="inherit"
+              className={classes.randomize}
+              onClick={props.newData}
+          >Randomize</Button>
         </Toolbar>
       </AppBar>
     </div>

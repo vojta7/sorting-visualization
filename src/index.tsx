@@ -4,17 +4,44 @@ import {MainBar} from "./components/menu";
 import {BarChart} from "./components/bar_chart";
 
 async function run() {
-    const wasm = await import("../sorting_rust/pkg/sorting");
+    //const wasm = await import("../sorting_rust/pkg/sorting");
 
-    let arr = [2,1,5,4,3]
-    let arri32 = Int32Array.from(arr);
-    let animations = wasm.bouble_sort(arri32);
-    ReactDOM.render(
+    ReactDOM.render(<App /> , document.getElementById("root"));
+}
+
+export interface IProps { }
+
+interface IState {
+    data: Array<number>;
+}
+
+class App extends React.Component<IProps,IState> {
+    constructor(props: IProps) {
+        super(props)
+        this.state = {
+            data: generateRandomArray(10, 10)
+        }
+    }
+    render() {
+        return (
         <div>
-            <MainBar />
-            <BarChart data={arr} />
+        <MainBar newData={() => this.newRandomData()}/>
+            <BarChart data={this.state.data} />
         </div>
-        , document.getElementById("root"));
+        )
+    }
+    newRandomData() {
+        this.setState({data: generateRandomArray(10, 10)})
+    }
+}
+
+function generateRandomArray(len: number, max: number): Array<number> {
+    let arr = new Array()
+    for (let i=0;i<len;i++) {
+        let n = Math.floor((Math.random() * max) + 1);
+        arr.push(n)
+    }
+    return arr
 }
 
 run()
