@@ -86,6 +86,7 @@ function App() {
     const [data, setData] = useState(generateRandomArray(10,10));
     const [dataLen, setDataLen] = useState(10);
     const [wasm, setWasm] = useState();
+    const [animations, setAnimations] = useState<Animation[] | null>(null);
     const handleSliderChange = (_event: any, newValue: number | number[]) => {
         if (typeof(newValue) === "number") {
             setDataLen(newValue);
@@ -94,6 +95,7 @@ function App() {
     };
     const randomizeArray = () => {
         setData(generateRandomArray(dataLen, 10))
+        setAnimations(null)
     };
     const classes = useStyles();
     React.useEffect(() => {
@@ -104,7 +106,11 @@ function App() {
         })
     },[])
     const tst = () => {
-        wasm_test(wasm, data, setData)
+        let myData = data.slice()
+        let arr = Int32Array.from(myData)
+        let animations = wasm.bouble_sort(arr) as Animation[]
+        setAnimations(animations)
+        //wasm_test(wasm, data, setData)
     }
     return (
           <div className={classes.root}>
@@ -149,13 +155,13 @@ function App() {
                 <CustomizedSelects />
             </Drawer>
             <main className={classes.content}>
-                <BarChart data={data}/>
+                <BarChart data={data} animations={animations}/>
             </main>
           </div>
     )
 }
 
-interface Animation {
+export interface Animation {
     Swap?: [number, number]
     Compare?: [number, number]
 }
