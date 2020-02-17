@@ -118,7 +118,7 @@ function App() {
             <AppBar className={classes.appBar}>
               <Toolbar>
                 <Typography variant="h6" className={classes.title}>
-                  Sorting visualization
+                  Visualization of sorting algorithms
                 </Typography>
                 <Button
                     color="inherit"

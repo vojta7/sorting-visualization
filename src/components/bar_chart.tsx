@@ -7,7 +7,9 @@ const barChartStyles = makeStyles(()=> createStyles(
     bar: {
       display: "inline-block",
       backgroundColor: "rebeccapurple",
-      width: 20
+      width: 20,
+      "margin-right": 5,
+      "vertical-align": "bottom"
     },
     compare1: {
       backgroundColor: "red",
