@@ -121,21 +121,19 @@ function App() {
     }
     const step = () => {
         if (animations == null || stepIdx >= animations.length) return
+        barCHartData.forEach((d) => d.color = BarColor.Normal);
         let animation = animations[stepIdx]
         if (animation.Compare != null) {
             let idx1=animation.Compare[0];
             let idx2=animation.Compare[1];
-            if (barCHartData[idx1].color != BarColor.Normal) { barCHartData[idx1].color = BarColor.Normal }
-            else { barCHartData[idx1].color = BarColor.CompareLeft }
-
-            if (barCHartData[idx2].color != BarColor.Normal) { barCHartData[idx2].color = BarColor.Normal }
-            else { barCHartData[idx2].color = BarColor.CompareRight }
+            barCHartData[idx1].color = BarColor.CompareLeft
+            barCHartData[idx2].color = BarColor.CompareRight
         } else if (animation.Swap != null) {
             let idx1=animation.Swap[0];
             let idx2=animation.Swap[1];
             [barCHartData[idx1].value,barCHartData[idx2].value] = [barCHartData[idx2].value,barCHartData[idx1].value] 
-            setBarCHartData(barCHartData)
         }
+        setBarCHartData(barCHartData)
         setStepIdx(stepIdx + 1);
         console.log(stepIdx);
     }
