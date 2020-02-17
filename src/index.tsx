@@ -1,7 +1,7 @@
 import * as React from "react";
 import {useState} from "react";
 import * as ReactDOM from "react-dom";
-import {BarChart} from "./components/bar_chart";
+import {BarChartData, BarColor, BarChart} from "./components/bar_chart";
 import {Button, MenuItem, Slider, Drawer, CssBaseline} from '@material-ui/core';
 import { makeStyles, Theme, createStyles } from '@material-ui/core/styles';
 import AppBar from '@material-ui/core/AppBar';
@@ -83,10 +83,11 @@ function CustomizedSelects() {
 }
 
 function App() {
-    const [data, setData] = useState(generateRandomArray(10,10));
+    const [barCHartData, setBarCHartData] = useState<BarChartData[]>([]);
     const [dataLen, setDataLen] = useState(10);
     const [wasm, setWasm] = useState();
     const [animations, setAnimations] = useState<Animation[] | null>(null);
+    const [stepIdx, setStepIdx] = useState<number>(0);
     const handleSliderChange = (_event: any, newValue: number | number[]) => {
         if (typeof(newValue) === "number") {
             setDataLen(newValue);
@@ -94,8 +95,15 @@ function App() {
         }
     };
     const randomizeArray = () => {
-        setData(generateRandomArray(dataLen, 10))
+        let data = generateRandomArray(dataLen, 10)
+        let barData = data.map((d) => {
+            let p = {value: d, color: BarColor.Normal}
+            return p
+        });
+        setBarCHartData(barData)
+        console.log(barData);
         setAnimations(null)
+        setStepIdx(0);
     };
     const classes = useStyles();
     React.useEffect(() => {
@@ -106,11 +114,30 @@ function App() {
         })
     },[])
     const tst = () => {
-        let myData = data.slice()
+        let myData = barCHartData.map(({value,}) => value).slice()
         let arr = Int32Array.from(myData)
-        let animations = wasm.bouble_sort(arr) as Animation[]
+        let animations = wasm.heap_sort(arr) as Animation[]
         setAnimations(animations)
-        //wasm_test(wasm, data, setData)
+    }
+    const step = () => {
+        if (animations == null || stepIdx >= animations.length) return
+        let animation = animations[stepIdx]
+        if (animation.Compare != null) {
+            let idx1=animation.Compare[0];
+            let idx2=animation.Compare[1];
+            if (barCHartData[idx1].color != BarColor.Normal) { barCHartData[idx1].color = BarColor.Normal }
+            else { barCHartData[idx1].color = BarColor.CompareLeft }
+
+            if (barCHartData[idx2].color != BarColor.Normal) { barCHartData[idx2].color = BarColor.Normal }
+            else { barCHartData[idx2].color = BarColor.CompareRight }
+        } else if (animation.Swap != null) {
+            let idx1=animation.Swap[0];
+            let idx2=animation.Swap[1];
+            [barCHartData[idx1].value,barCHartData[idx2].value] = [barCHartData[idx2].value,barCHartData[idx1].value] 
+            setBarCHartData(barCHartData)
+        }
+        setStepIdx(stepIdx + 1);
+        console.log(stepIdx);
     }
     return (
           <div className={classes.root}>
@@ -120,6 +147,10 @@ function App() {
                 <Typography variant="h6" className={classes.title}>
                   Visualization of sorting algorithms
                 </Typography>
+                <Button
+                    color="inherit"
+                    onClick={step}
+                >Step</Button>
                 <Button
                     color="inherit"
                     className={classes.sort}
@@ -155,7 +186,7 @@ function App() {
                 <CustomizedSelects />
             </Drawer>
             <main className={classes.content}>
-                <BarChart data={data} animations={animations}/>
+                <BarChart data={barCHartData}/>
             </main>
           </div>
     )
