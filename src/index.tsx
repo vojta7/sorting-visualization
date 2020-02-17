@@ -166,28 +166,6 @@ export interface Animation {
     Compare?: [number, number]
 }
 
-function wasm_test(wasm: any, data: number[], setData: (n: React.SetStateAction<number[]>) => void) {
-    let myData = data.slice()
-    let arr = Int32Array.from(myData)
-    let animations = wasm.bouble_sort(arr) as Animation[]
-    let timeout = 100;
-    for (let i=0;i<animations.length;i++) {
-        let animation = animations[i];
-        if (typeof(animation.Compare) !== "undefined") {
-            console.log(`Compare ${animation.Compare[0]} and ${animation.Compare[1]}`)
-        } else if (typeof(animation.Swap) !== "undefined") {
-            console.log(`Swap ${animation.Swap[0]} and ${animation.Swap[1]}`)
-            let tmp = myData[animation.Swap[0]]
-            myData[animation.Swap[0]] = myData[animation.Swap[1]]
-            myData[animation.Swap[1]] = tmp
-        }
-        let d = myData.slice()
-        setTimeout(()=>{
-            setData(d)
-        }, timeout * i)
-    }
-}
-
 function generateRandomArray(len: number, max: number): Array<number> {
     let arr = new Array()
     for (let i=0;i<len;i++) {
