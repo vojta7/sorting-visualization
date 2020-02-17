@@ -23,7 +23,6 @@ fn bouble_sort_inner(array: &[i32]) -> (Vec<i32>,Vec<Animation>)
     for i in 1..(array.len()) {
         for j in 0..(array.len() - i) {
             animations.push(Animation::Compare(j,j+1));
-            animations.push(Animation::Compare(j,j+1));
             if array[j] > array[j+1] {
                 animations.push(Animation::Swap(j,j+1));
                 let tmp = array[j];
@@ -40,7 +39,6 @@ fn bouble_up(arr: &mut[i32], animations: &mut Vec<Animation>) {
     loop {
         if idx < 1 { break }
         let parrent_idx = (idx-1)/2;
-        animations.push(Animation::Compare(parrent_idx,idx));
         animations.push(Animation::Compare(parrent_idx,idx));
         if arr[parrent_idx] < arr[idx] {
             animations.push(Animation::Swap(parrent_idx,idx));
@@ -60,7 +58,6 @@ fn bouble_down(arr: &mut[i32], idx: usize, animations: &mut Vec<Animation>) {
     if arr.len() <= 2*idx +1 { return }
     if arr.len() <= 2*idx +2 {
         animations.push(Animation::Compare(2*idx +1,idx));
-        animations.push(Animation::Compare(2*idx +1,idx));
         if arr[2*idx +1] > arr[idx] {
             animations.push(Animation::Swap(2*idx +1,idx));
             arr.swap(2*idx +1,idx);
@@ -70,14 +67,12 @@ fn bouble_down(arr: &mut[i32], idx: usize, animations: &mut Vec<Animation>) {
 
     let max;
     animations.push(Animation::Compare(2*idx +1,2*idx +2));
-    animations.push(Animation::Compare(2*idx +1,2*idx +2));
     if arr[2*idx +1] >= arr[2*idx+2] {
         max = 2*idx +1;
     } else {
         max = 2*idx +2;
     }
     if max != idx {
-        animations.push(Animation::Compare(max,idx));
         animations.push(Animation::Compare(max,idx));
         if arr[max] > arr[idx] {
             animations.push(Animation::Swap(max,idx));
