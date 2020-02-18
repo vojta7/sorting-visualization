@@ -45,6 +45,7 @@ function App() {
     const [barChartData, setBarChartData] = useState<selectedSort[]>([null, null]);
     const [values, setValues] = useState<number[]>([]);
     const [running, setRunning] = useState(false);
+    const [animationTimeout, setAnimationTimeout] = useState(100);
     const [dataLen, setDataLen] = useState(10);
     const [wasm, setWasm] = useState();
     const [step, setStep] = useState(0);
@@ -54,12 +55,19 @@ function App() {
             generateNewArray(newValue);
         }
     };
+    const handleSpeedChange = (_event: any, newValue: number | number[]) => {
+        if (typeof(newValue) === "number") {
+            setAnimationTimeout(newValue);
+        }
+    };
     let runningRef = React.useRef(running)
     runningRef.current = running
     let stepRef = React.useRef(step)
     stepRef.current = step
     let barChartDataRef = React.useRef(barChartData)
     barChartDataRef.current = barChartData
+    let animationTimeoutRef = React.useRef(animationTimeout)
+    animationTimeoutRef.current = animationTimeout
     const toggleAnimation = (start: boolean) => {
         setRunning(start)
         runningRef.current = start
@@ -77,9 +85,10 @@ function App() {
         }
         change_animation(stepRef.current, barChartDataRef.current)
         setStep(stepRef.current +1)
-        setTimeout(animate,200)
+        setTimeout(animate,animationTimeoutRef.current)
     }
     const reset = () => {
+        setRunning(false)
         generateNewArray(dataLen)
         setStep(0)
     }
@@ -199,12 +208,13 @@ function App() {
                              <Grid item xs={3}><Typography variant="subtitle2">Speed</Typography></Grid>
                              <Grid item xs>
                                  <Slider
-                                     defaultValue={10}
+                                     onChange={handleSpeedChange}
                                      aria-labelledby="discrete-slider"
                                      valueLabelDisplay="auto"
-                                     step={1}
-                                     min={10}
-                                     max={100}
+                                     value={animationTimeout}
+                                     step={5}
+                                     min={5}
+                                     max={1000}
                                  />
                              </Grid>
                          </Grid>
