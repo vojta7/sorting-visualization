@@ -28,44 +28,49 @@ const useStyles = makeStyles((theme: Theme) =>
 
 export enum Alghoritm {
     Bouble,
-    Quick,
+    //Quick,
     Heap
 }
 
 const AvailableAlghoritms: [Alghoritm, string][] = [
     [Alghoritm.Bouble, "Bouble Sort"],
-    [Alghoritm.Quick, "Quick Sort"],
+    //[Alghoritm.Quick, "Quick Sort"],
     [Alghoritm.Heap, "Heap Sort"]
 ]
 
-type selectedSort = {alghoritm: Alghoritm, data: BarChartData[]} | null
+type selectedSort = {alghoritm: Alghoritm, data: BarChartData[], animations: Animation[]} | null
 
 function App() {
     const [barChartData, setBarChartData] = useState<selectedSort[]>([null, null]);
-    const [values, setValues] = useState<number[]>([1,2,1]);
+    const [values, setValues] = useState<number[]>([]);
     const [dataLen, setDataLen] = useState(10);
     const [wasm, setWasm] = useState();
-    const [animations, setAnimations] = useState<Animation[] | null>(null);
+    const [step, setStep] = useState(0);
     const handleSizeChange = (_event: any, newValue: number | number[]) => {
         if (typeof(newValue) === "number" && newValue != dataLen) {
             setDataLen(newValue);
             generateNewArray(newValue);
         }
     };
-    const stepAnimation = (_event: any, newValue: number | number[]) => {
-        if (typeof(newValue) === "number") {
-            change_animation(newValue);
-        }
-    }
+    //const stepAnimation = (_event: any, newValue: number | number[]) => {
+    //    if (typeof(newValue) === "number") {
+    //        change_animation(newValue);
+    //    }
+    //}
     const generateNewArray = (len: number) => {
         let data = generateRandomArray(len, 10)
         setValues(data)
-        //let barData = data.map((d) => {
-        //    let p = {value: d, color: BarColor.Normal}
-        //    return p
-        //});
-        //setBarChartData(barData) //TODO
-        //generate_animations(barData)
+        setStep(0)
+        setBarChartData(updateData(data, barChartData))
+    }
+    const updateData = (data: number[], oldBarChartData: selectedSort[]): selectedSort[] => {
+        let newBarChartData = oldBarChartData.slice()
+        newBarChartData.map((el) => {
+            if (el === null) return
+            el.data = data.map((v) => { return { value: v, color: BarColor.Normal } })
+            el.animations = generateAnimations(data, el.alghoritm)
+        })
+        return newBarChartData
     };
     const classes = useStyles();
     React.useEffect(() => {
@@ -75,54 +80,54 @@ function App() {
             setWasm(wasm)
         })
     },[])
-    const generate_animations = (data: BarChartData[]) => {
-        let myData = data.map(({value,}) => value).slice()
-        let arr = Int32Array.from(myData)
-        let animations = wasm.heap_sort(arr) as Animation[]
-        console.log(animations);
-        setAnimations(animations)
+    const generateAnimations = (data: number[], alghoritm: Alghoritm): Animation[] => {
+        let arr = Int32Array.from(data)
+        switch (alghoritm) {
+            case Alghoritm.Heap: {
+                return wasm.heap_sort(arr) as Animation[]
+            }
+            case Alghoritm.Bouble: {
+                return wasm.bouble_sort(arr) as Animation[]
+            }
+        }
     }
     const selectAlghoritm = (alghoritm: Alghoritm | null, idx: number) => {
         let newData = barChartData.slice()
         if (alghoritm === null) {
             newData[idx] = null;
         } else {
-            let tmp = values.map((v) => {
-                let p = { value: v, color: BarColor.Normal}
-                return p
-            })
-            newData[idx] = { alghoritm, data: tmp }
+            newData[idx] = {alghoritm, data: [], animations: []}
+            newData = updateData(values, newData)
         }
         setBarChartData(newData)
-        console.log(newData[idx])
     }
-    const change_animation = (idx: number) => {
-        if (animations == null || idx >= animations.length) return
-        let newData = values.map((v) => {
-            let p = {value: v, color: BarColor.Normal}
-            return p
-        });
-        for (let i=0;i<idx;i++) {
-            let animation = animations[i]
-            if (animation.Swap != null) {
-                let idx1=animation.Swap[0];
-                let idx2=animation.Swap[1];
-                [newData[idx1].value,newData[idx2].value] = [newData[idx2].value,newData[idx1].value]
-            }
-        }
-        let animation = animations[idx]
-        if (animation.Compare != null) {
-            let idx1=animation.Compare[0];
-            let idx2=animation.Compare[1];
-            newData[idx1].color = BarColor.CompareLeft
-            newData[idx2].color = BarColor.CompareRight
-        } else if (animation.Swap != null) {
-            let idx1=animation.Swap[0];
-            let idx2=animation.Swap[1];
-            [newData[idx1].value,newData[idx2].value] = [newData[idx2].value,newData[idx1].value]
-        }
-        //setBarChartData(newData)
-    }
+    //const change_animation = (idx: number) => {
+    //    if (animations == null || idx >= animations.length) return
+    //    let newData = values.map((v) => {
+    //        let p = {value: v, color: BarColor.Normal}
+    //        return p
+    //    });
+    //    for (let i=0;i<idx;i++) {
+    //        let animation = animations[i]
+    //        if (animation.Swap != null) {
+    //            let idx1=animation.Swap[0];
+    //            let idx2=animation.Swap[1];
+    //            [newData[idx1].value,newData[idx2].value] = [newData[idx2].value,newData[idx1].value]
+    //        }
+    //    }
+    //    let animation = animations[idx]
+    //    if (animation.Compare != null) {
+    //        let idx1=animation.Compare[0];
+    //        let idx2=animation.Compare[1];
+    //        newData[idx1].color = BarColor.CompareLeft
+    //        newData[idx2].color = BarColor.CompareRight
+    //    } else if (animation.Swap != null) {
+    //        let idx1=animation.Swap[0];
+    //        let idx2=animation.Swap[1];
+    //        [newData[idx1].value,newData[idx2].value] = [newData[idx2].value,newData[idx1].value]
+    //    }
+    //    //setBarChartData(newData)
+    //}
     return (
           <Box className={classes.content} height="100%">
             <Container maxWidth={false}>
