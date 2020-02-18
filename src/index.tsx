@@ -52,6 +52,10 @@ function App() {
             generateNewArray(newValue);
         }
     };
+    const reset = () => {
+        generateNewArray(dataLen)
+        setStep(0)
+    }
     const handleStepChange = (_event: any, newValue: number | number[]) => {
         if (typeof(newValue) === "number" && newValue != step) {
             setStep(newValue)
@@ -199,7 +203,7 @@ function App() {
                              </Button>
                          </Grid>
                          <Grid item xs={6}>
-                             <Button aria-label="Animate">
+                             <Button aria-label="Animate" onClick={reset}>
                                  <ReplayIcon fontSize="large" />
                              </Button>
                          </Grid>
