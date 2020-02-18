@@ -55,7 +55,7 @@ function App() {
     const handleStepChange = (_event: any, newValue: number | number[]) => {
         if (typeof(newValue) === "number" && newValue != dataLen) {
             setStep(newValue)
-            change_animation(newValue)
+            change_animation(newValue, barChartData)
         }
     };
     const generateNewArray = (len: number) => {
@@ -101,34 +101,37 @@ function App() {
             newData = updateData(values, newData)
         }
         setBarChartData(newData)
+        change_animation(step, newData)
     }
-    const change_animation = (idx: number) => {
+    const change_animation = (idx: number, barChartData: selectedSort[]) => {
         for (let sort of barChartData) {
-            if (sort == null) return
+            if (sort == null) continue
             let myIdx = Math.min(sort.animations.length -1,idx)
             let animations = sort.animations
             let newData = values.map((v) => {
                 let p = {value: v, color: BarColor.Normal}
                 return p
             });
-            for (let i=0;i<myIdx;i++) {
-                let animation = animations[i]
-                if (animation.Swap != null) {
+            if (animations.length > 0) {
+                for (let i=0;i<myIdx;i++) {
+                    let animation = animations[i]
+                    if (animation.Swap != null) {
+                        let idx1=animation.Swap[0];
+                        let idx2=animation.Swap[1];
+                        [newData[idx1].value,newData[idx2].value] = [newData[idx2].value,newData[idx1].value]
+                    }
+                }
+                let animation = animations[myIdx]
+                if (animation.Compare != null) {
+                    let idx1=animation.Compare[0];
+                    let idx2=animation.Compare[1];
+                    newData[idx1].color = BarColor.CompareLeft
+                    newData[idx2].color = BarColor.CompareRight
+                } else if (animation.Swap != null) {
                     let idx1=animation.Swap[0];
                     let idx2=animation.Swap[1];
                     [newData[idx1].value,newData[idx2].value] = [newData[idx2].value,newData[idx1].value]
                 }
-            }
-            let animation = animations[myIdx]
-            if (animation.Compare != null) {
-                let idx1=animation.Compare[0];
-                let idx2=animation.Compare[1];
-                newData[idx1].color = BarColor.CompareLeft
-                newData[idx2].color = BarColor.CompareRight
-            } else if (animation.Swap != null) {
-                let idx1=animation.Swap[0];
-                let idx2=animation.Swap[1];
-                [newData[idx1].value,newData[idx2].value] = [newData[idx2].value,newData[idx1].value]
             }
             sort.data = newData
         }
