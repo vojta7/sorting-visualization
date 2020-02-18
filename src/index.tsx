@@ -2,32 +2,25 @@ import * as React from "react";
 import {useState} from "react";
 import * as ReactDOM from "react-dom";
 import {BarChartData, BarColor, BarChart} from "./components/bar_chart";
-import {List, ListItem, ListItemText, Dialog, Fab, Button, MenuItem, Slider, Drawer, CssBaseline, Container, Box, SvgIcon, IconButton} from '@material-ui/core';
-import AddCircleIcon from '@material-ui/icons/AddCircle';
-import CloseIcon from '@material-ui/icons/Close';
-import { sizing } from '@material-ui/system';
+import {Button, Typography, Slider, Container, Box, Grid} from '@material-ui/core';
+import PlayArrowIcon from '@material-ui/icons/PlayArrow';
+import ReplayIcon from '@material-ui/icons/Replay';
 import { makeStyles, Theme, createStyles } from '@material-ui/core/styles';
-import AppBar from '@material-ui/core/AppBar';
-import Toolbar from '@material-ui/core/Toolbar';
-import Typography from '@material-ui/core/Typography';
-import Select from '@material-ui/core/Select';
 
 async function run() {
     ReactDOM.render(<App /> , document.getElementById("root"));
 }
 
-const drawerWidth = 240;
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
       content: {
           "min-height": "100vh"
       },
-      menu: {
-          "background-color": "red",
-          "height": "calc(100vh/5)"
+      heading: {
+          "text-align": "center"
       },
       chart: {
-          "height": "calc(100vh/5*2)",
+          "height": "calc(100vh/3)", //TODO
           border: "solid 1px black"
       },
   }),
@@ -44,37 +37,6 @@ const AvailableAlghoritms: [Alghoritm, string][] = [
     [Alghoritm.Quick, "Quick Sort"],
     [Alghoritm.Heap, "Heap Sort"]
 ]
-
-const alghoritmUseStyles = makeStyles(
-  createStyles({
-    label: {
-        "margin-right": 20,
-        "vertical-align": "super",
-    },
-  }),
-);
-
-function CustomizedSelects() {
-  const classes = alghoritmUseStyles();
-  const [alghoritm, setAlghoritm] = React.useState(Alghoritm.Bouble);
-  const handleChange = (event: React.ChangeEvent<{ value: unknown }>) => {
-    setAlghoritm(event.target.value as Alghoritm);
-  };
-  return (
-      <div>
-        <span className={classes.label}>Select alghoritm</span>
-        <Select
-          labelId="alghoritm-select-label"
-          id="alghoritm-select"
-          value={alghoritm}
-          onChange={handleChange}
-        >
-          <MenuItem value={Alghoritm.Bouble}>Bouble Sort</MenuItem>
-          <MenuItem value={Alghoritm.Quick}>Quick Sort</MenuItem>
-        </Select>
-    </div>
-  );
-}
 
 type selectedSort = {alghoritm: Alghoritm, data: BarChartData[]} | null
 
@@ -161,15 +123,67 @@ function App() {
         }
         //setBarChartData(newData)
     }
-    let tmp = generateRandomArray(dataLen, 10)
-    let tmpBarData = tmp.map((d) => {
-        let p = {value: d, color: BarColor.Normal}
-        return p
-    });
     return (
           <Box className={classes.content} height="100%">
-            <Container className={classes.menu} maxWidth={false}>
-                TODO: menu
+            <Container maxWidth={false}>
+                 <Grid container spacing={2}>
+                     <Grid item xs={12}>
+                         <Typography variant="h3" component="h1" className={classes.heading}>Visualization of sorting alghoritms</Typography>
+                     </Grid>
+                     <Grid item xs={9} container>
+                         <Grid item xs={12} container>
+                             <Grid item xs={3}><Typography variant="subtitle2">Steps</Typography></Grid>
+                             <Grid item xs>
+                                 <Slider
+                                     defaultValue={10}
+                                     aria-labelledby="discrete-slider"
+                                     valueLabelDisplay="auto"
+                                     step={1}
+                                     min={10}
+                                     max={100}
+                                 />
+                             </Grid>
+                         </Grid>
+                         <Grid item xs={12} container>
+                             <Grid item xs={3}><Typography variant="subtitle2">Speed</Typography></Grid>
+                             <Grid item xs>
+                                 <Slider
+                                     defaultValue={10}
+                                     aria-labelledby="discrete-slider"
+                                     valueLabelDisplay="auto"
+                                     step={1}
+                                     min={10}
+                                     max={100}
+                                 />
+                             </Grid>
+                         </Grid>
+                         <Grid item xs={12} container>
+                             <Grid item xs={3}><Typography variant="subtitle2">Size</Typography></Grid>
+                             <Grid item xs>
+                                 <Slider
+                                     defaultValue={10}
+                                     aria-labelledby="discrete-slider"
+                                     valueLabelDisplay="auto"
+                                     step={1}
+                                     min={10}
+                                     max={100}
+                                 />
+                             </Grid>
+                         </Grid>
+                     </Grid>
+                     <Grid item xs={3} container alignContent="center">
+                         <Grid item xs={6}>
+                             <Button aria-label="Animate">
+                                 <PlayArrowIcon fontSize="large" />
+                             </Button>
+                         </Grid>
+                         <Grid item xs={6}>
+                             <Button aria-label="Animate">
+                                 <ReplayIcon fontSize="large" />
+                             </Button>
+                         </Grid>
+                     </Grid>
+                </Grid>
             </Container>
             {barChartData.map((chartData, idx) => (
                 <Container className={classes.chart} maxWidth={false} key={idx}>
