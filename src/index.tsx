@@ -2,7 +2,10 @@ import * as React from "react";
 import {useState} from "react";
 import * as ReactDOM from "react-dom";
 import {BarChartData, BarColor, BarChart} from "./components/bar_chart";
-import {Button, MenuItem, Slider, Drawer, CssBaseline} from '@material-ui/core';
+import {List, ListItem, ListItemText, Dialog, Fab, Button, MenuItem, Slider, Drawer, CssBaseline, Container, Box, SvgIcon, IconButton} from '@material-ui/core';
+import AddCircleIcon from '@material-ui/icons/AddCircle';
+import CloseIcon from '@material-ui/icons/Close';
+import { sizing } from '@material-ui/system';
 import { makeStyles, Theme, createStyles } from '@material-ui/core/styles';
 import AppBar from '@material-ui/core/AppBar';
 import Toolbar from '@material-ui/core/Toolbar';
@@ -16,40 +19,31 @@ async function run() {
 const drawerWidth = 240;
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
-    root: {
-      display: 'flex',
-    },
-    title: {
-      flexGrow: 2,
-    },
-    sort: {
-      flexGrow: 1,
-    },
-    randomize: {
-      flexGrow: 1,
-    },
-    appBar: {
-      zIndex: theme.zIndex.drawer + 1,
-    },
-    drawer: {
-      width: drawerWidth,
-      flexShrink: 0,
-    },
-    drawerPaper: {
-      width: drawerWidth,
-    },
-    content: {
-      flexGrow: 1,
-      padding: theme.spacing(11),
-    },
-    toolbar: theme.mixins.toolbar,
+      content: {
+          "min-height": "100vh"
+      },
+      menu: {
+          "background-color": "red",
+          "height": "calc(100vh/5)"
+      },
+      chart: {
+          "height": "calc(100vh/5*2)",
+          border: "solid 1px black"
+      },
   }),
 );
 
-enum Alghoritm {
+export enum Alghoritm {
     Bouble,
-    Quick
+    Quick,
+    Heap
 }
+
+const AvailableAlghoritms: [Alghoritm, string][] = [
+    [Alghoritm.Bouble, "Bouble Sort"],
+    [Alghoritm.Quick, "Quick Sort"],
+    [Alghoritm.Heap, "Heap Sort"]
+]
 
 const alghoritmUseStyles = makeStyles(
   createStyles({
@@ -82,9 +76,11 @@ function CustomizedSelects() {
   );
 }
 
+type selectedSort = {alghoritm: Alghoritm, data: BarChartData[]} | null
+
 function App() {
-    const [barChartData, setBarChartData] = useState<BarChartData[]>([]);
-    const [values, setValues] = useState<number[]>([]);
+    const [barChartData, setBarChartData] = useState<selectedSort[]>([null, null]);
+    const [values, setValues] = useState<number[]>([1,2,1]);
     const [dataLen, setDataLen] = useState(10);
     const [wasm, setWasm] = useState();
     const [animations, setAnimations] = useState<Animation[] | null>(null);
@@ -106,7 +102,7 @@ function App() {
             return p
         });
         setValues(data)
-        setBarChartData(barData)
+        //setBarChartData(barData) //TODO
         generate_animations(barData)
     };
     const classes = useStyles();
@@ -123,6 +119,20 @@ function App() {
         let animations = wasm.heap_sort(arr) as Animation[]
         console.log(animations);
         setAnimations(animations)
+    }
+    const selectAlghoritm = (alghoritm: Alghoritm | null, idx: number) => {
+        let newData = barChartData.slice()
+        if (alghoritm === null) {
+            newData[idx] = null;
+        } else {
+            let tmp = values.map((v) => {
+                let p = { value: v, color: BarColor.Normal}
+                return p
+            })
+            newData[idx] = { alghoritm, data: tmp }
+        }
+        setBarChartData(newData)
+        console.log(newData[idx])
     }
     const change_animation = (idx: number) => {
         if (animations == null || idx >= animations.length) return
@@ -149,59 +159,27 @@ function App() {
             let idx2=animation.Swap[1];
             [newData[idx1].value,newData[idx2].value] = [newData[idx2].value,newData[idx1].value]
         }
-        setBarChartData(newData)
+        //setBarChartData(newData)
     }
+    let tmp = generateRandomArray(dataLen, 10)
+    let tmpBarData = tmp.map((d) => {
+        let p = {value: d, color: BarColor.Normal}
+        return p
+    });
     return (
-          <div className={classes.root}>
-            <CssBaseline />
-            <AppBar className={classes.appBar}>
-              <Toolbar>
-                <Typography variant="h6" className={classes.title}>
-                  Visualization of sorting algorithms
-                </Typography>
-                <Slider
-                  defaultValue={0}
-                  aria-labelledby="discrete-slider-small-steps"
-                  step={1}
-                  marks
-                  min={0}
-                  onChange={stepAnimation}
-                  max={animations != null ? animations.length : 0}
-                  valueLabelDisplay="auto"
-                />
-                <Button
-                    color="inherit"
-                    className={classes.randomize}
-                    onClick={randomizeArray}
-                >Randomize</Button>
-              </Toolbar>
-            </AppBar>
-            <Drawer
-              className={classes.drawer}
-              variant="persistent"
-              anchor="left"
-              open={true}
-              classes={{
-                paper: classes.drawerPaper,
-              }}
-            >
-                <div className={classes.toolbar} />
-                <Slider
-                    color='secondary'
-                    defaultValue={10}
-                    aria-labelledby="discrete-slider"
-                    valueLabelDisplay="auto"
-                    onChange={handleSliderChange}
-                    step={1}
-                    min={10}
-                    max={100}
-                />
-                <CustomizedSelects />
-            </Drawer>
-            <main className={classes.content}>
-                <BarChart data={barChartData}/>
-            </main>
-          </div>
+          <Box className={classes.content} height="100%">
+            <Container className={classes.menu} maxWidth={false}>
+                TODO: menu
+            </Container>
+            {barChartData.map((chartData, idx) => (
+                <Container className={classes.chart} maxWidth={false} key={idx}>
+                <BarChart
+                    data={chartData != null ? chartData.data : null}
+                    alghoritms={AvailableAlghoritms}
+                    onSelect={(alghoritm)=>selectAlghoritm(alghoritm, idx)} />
+                </Container>
+            ))}
+          </Box>
     )
 }
 
