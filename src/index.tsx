@@ -46,10 +46,10 @@ function App() {
     const [dataLen, setDataLen] = useState(10);
     const [wasm, setWasm] = useState();
     const [animations, setAnimations] = useState<Animation[] | null>(null);
-    const handleSliderChange = (_event: any, newValue: number | number[]) => {
-        if (typeof(newValue) === "number") {
+    const handleSizeChange = (_event: any, newValue: number | number[]) => {
+        if (typeof(newValue) === "number" && newValue != dataLen) {
             setDataLen(newValue);
-            randomizeArray();
+            generateNewArray(newValue);
         }
     };
     const stepAnimation = (_event: any, newValue: number | number[]) => {
@@ -57,15 +57,15 @@ function App() {
             change_animation(newValue);
         }
     }
-    const randomizeArray = () => {
-        let data = generateRandomArray(dataLen, 10)
-        let barData = data.map((d) => {
-            let p = {value: d, color: BarColor.Normal}
-            return p
-        });
+    const generateNewArray = (len: number) => {
+        let data = generateRandomArray(len, 10)
         setValues(data)
+        //let barData = data.map((d) => {
+        //    let p = {value: d, color: BarColor.Normal}
+        //    return p
+        //});
         //setBarChartData(barData) //TODO
-        generate_animations(barData)
+        //generate_animations(barData)
     };
     const classes = useStyles();
     React.useEffect(() => {
@@ -161,6 +161,7 @@ function App() {
                              <Grid item xs={3}><Typography variant="subtitle2">Size</Typography></Grid>
                              <Grid item xs>
                                  <Slider
+                                     onChange={handleSizeChange}
                                      defaultValue={10}
                                      aria-labelledby="discrete-slider"
                                      valueLabelDisplay="auto"
