@@ -52,11 +52,12 @@ function App() {
             generateNewArray(newValue);
         }
     };
-    //const stepAnimation = (_event: any, newValue: number | number[]) => {
-    //    if (typeof(newValue) === "number") {
-    //        change_animation(newValue);
-    //    }
-    //}
+    const handleStepChange = (_event: any, newValue: number | number[]) => {
+        if (typeof(newValue) === "number" && newValue != dataLen) {
+            setStep(newValue)
+            change_animation(newValue)
+        }
+    };
     const generateNewArray = (len: number) => {
         let data = generateRandomArray(len, 10)
         setValues(data)
@@ -101,33 +102,42 @@ function App() {
         }
         setBarChartData(newData)
     }
-    //const change_animation = (idx: number) => {
-    //    if (animations == null || idx >= animations.length) return
-    //    let newData = values.map((v) => {
-    //        let p = {value: v, color: BarColor.Normal}
-    //        return p
-    //    });
-    //    for (let i=0;i<idx;i++) {
-    //        let animation = animations[i]
-    //        if (animation.Swap != null) {
-    //            let idx1=animation.Swap[0];
-    //            let idx2=animation.Swap[1];
-    //            [newData[idx1].value,newData[idx2].value] = [newData[idx2].value,newData[idx1].value]
-    //        }
-    //    }
-    //    let animation = animations[idx]
-    //    if (animation.Compare != null) {
-    //        let idx1=animation.Compare[0];
-    //        let idx2=animation.Compare[1];
-    //        newData[idx1].color = BarColor.CompareLeft
-    //        newData[idx2].color = BarColor.CompareRight
-    //    } else if (animation.Swap != null) {
-    //        let idx1=animation.Swap[0];
-    //        let idx2=animation.Swap[1];
-    //        [newData[idx1].value,newData[idx2].value] = [newData[idx2].value,newData[idx1].value]
-    //    }
-    //    //setBarChartData(newData)
-    //}
+    const change_animation = (idx: number) => {
+        for (let sort of barChartData) {
+            if (sort == null) return
+            let myIdx = Math.min(sort.animations.length -1,idx)
+            let animations = sort.animations
+            let newData = values.map((v) => {
+                let p = {value: v, color: BarColor.Normal}
+                return p
+            });
+            for (let i=0;i<myIdx;i++) {
+                let animation = animations[i]
+                if (animation.Swap != null) {
+                    let idx1=animation.Swap[0];
+                    let idx2=animation.Swap[1];
+                    [newData[idx1].value,newData[idx2].value] = [newData[idx2].value,newData[idx1].value]
+                }
+            }
+            let animation = animations[myIdx]
+            if (animation.Compare != null) {
+                let idx1=animation.Compare[0];
+                let idx2=animation.Compare[1];
+                newData[idx1].color = BarColor.CompareLeft
+                newData[idx2].color = BarColor.CompareRight
+            } else if (animation.Swap != null) {
+                let idx1=animation.Swap[0];
+                let idx2=animation.Swap[1];
+                [newData[idx1].value,newData[idx2].value] = [newData[idx2].value,newData[idx1].value]
+            }
+            sort.data = newData
+        }
+        setBarChartData(barChartData)
+    }
+    let maxStep = barChartData.reduce((max,v) => {
+        if (v === null) return max
+        return Math.max(v.animations.length, max)
+    }, 0)
     return (
           <Box className={classes.content} height="100%">
             <Container maxWidth={false}>
@@ -140,12 +150,13 @@ function App() {
                              <Grid item xs={3}><Typography variant="subtitle2">Steps</Typography></Grid>
                              <Grid item xs>
                                  <Slider
-                                     defaultValue={10}
+                                     onChange={handleStepChange}
+                                     defaultValue={0}
                                      aria-labelledby="discrete-slider"
                                      valueLabelDisplay="auto"
                                      step={1}
-                                     min={10}
-                                     max={100}
+                                     min={0}
+                                     max={maxStep}
                                  />
                              </Grid>
                          </Grid>

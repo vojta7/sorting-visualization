@@ -59,7 +59,6 @@ export interface BarChartProps {
 }
 
 export function BarChart(props: BarChartProps) {
-    console.log(props)
     if (props.data != null) {
         return (<BarChartInner data={props.data} onSelect={props.onSelect} />)
     } else {
