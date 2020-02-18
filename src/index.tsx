@@ -53,7 +53,7 @@ function App() {
         }
     };
     const handleStepChange = (_event: any, newValue: number | number[]) => {
-        if (typeof(newValue) === "number" && newValue != dataLen) {
+        if (typeof(newValue) === "number" && newValue != step) {
             setStep(newValue)
             change_animation(newValue, barChartData)
         }
@@ -104,7 +104,8 @@ function App() {
         change_animation(step, newData)
     }
     const change_animation = (idx: number, barChartData: selectedSort[]) => {
-        for (let sort of barChartData) {
+        let newBarChartData = barChartData.slice()
+        for (let sort of newBarChartData) {
             if (sort == null) continue
             let myIdx = Math.min(sort.animations.length -1,idx)
             let animations = sort.animations
@@ -135,7 +136,7 @@ function App() {
             }
             sort.data = newData
         }
-        setBarChartData(barChartData)
+        setBarChartData(newBarChartData)
     }
     let maxStep = barChartData.reduce((max,v) => {
         if (v === null) return max
