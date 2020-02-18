@@ -151,12 +151,12 @@ function App() {
                              <Grid item xs>
                                  <Slider
                                      onChange={handleStepChange}
-                                     defaultValue={0}
                                      aria-labelledby="discrete-slider"
                                      valueLabelDisplay="auto"
                                      step={1}
                                      min={0}
                                      max={maxStep}
+                                     value={step}
                                  />
                              </Grid>
                          </Grid>
@@ -178,12 +178,12 @@ function App() {
                              <Grid item xs>
                                  <Slider
                                      onChange={handleSizeChange}
-                                     defaultValue={10}
                                      aria-labelledby="discrete-slider"
                                      valueLabelDisplay="auto"
                                      step={1}
                                      min={10}
                                      max={100}
+                                     value={dataLen}
                                  />
                              </Grid>
                          </Grid>
