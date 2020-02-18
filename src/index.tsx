@@ -4,6 +4,7 @@ import * as ReactDOM from "react-dom";
 import {BarChartData, BarColor, BarChart} from "./components/bar_chart";
 import {Button, Typography, Slider, Container, Box, Grid} from '@material-ui/core';
 import PlayArrowIcon from '@material-ui/icons/PlayArrow';
+import PauseIcon from '@material-ui/icons/Pause';
 import ReplayIcon from '@material-ui/icons/Replay';
 import { makeStyles, Theme, createStyles } from '@material-ui/core/styles';
 
@@ -43,6 +44,7 @@ type selectedSort = {alghoritm: Alghoritm, data: BarChartData[], animations: Ani
 function App() {
     const [barChartData, setBarChartData] = useState<selectedSort[]>([null, null]);
     const [values, setValues] = useState<number[]>([]);
+    const [running, setRunning] = useState(false);
     const [dataLen, setDataLen] = useState(10);
     const [wasm, setWasm] = useState();
     const [step, setStep] = useState(0);
@@ -52,6 +54,31 @@ function App() {
             generateNewArray(newValue);
         }
     };
+    let runningRef = React.useRef(running)
+    runningRef.current = running
+    let stepRef = React.useRef(step)
+    stepRef.current = step
+    let barChartDataRef = React.useRef(barChartData)
+    barChartDataRef.current = barChartData
+    const toggleAnimation = (start: boolean) => {
+        setRunning(start)
+        runningRef.current = start
+        if (start) animate()
+    }
+    const animate = () => {
+        if (!runningRef.current) return
+        let maxLen = barChartDataRef.current.reduce((max,v) => {
+            if (v === null) return max
+            return Math.max(v.animations.length, max)
+        }, 0)
+        if (stepRef.current >= maxLen) {
+            setRunning(false)
+            return;
+        }
+        change_animation(stepRef.current, barChartDataRef.current)
+        setStep(stepRef.current +1)
+        setTimeout(animate,200)
+    }
     const reset = () => {
         generateNewArray(dataLen)
         setStep(0)
@@ -198,14 +225,12 @@ function App() {
                      </Grid>
                      <Grid item xs={3} container alignContent="center">
                          <Grid item xs={6}>
-                             <Button aria-label="Animate">
-                                 <PlayArrowIcon fontSize="large" />
-                             </Button>
+                            <RunPause running={running} onClick={toggleAnimation} />
                          </Grid>
                          <Grid item xs={6}>
-                             <Button aria-label="Animate" onClick={reset}>
-                                 <ReplayIcon fontSize="large" />
-                             </Button>
+                            <Button aria-label="Animate" onClick={reset}>
+                                <ReplayIcon fontSize="large" />
+                            </Button>
                          </Grid>
                      </Grid>
                 </Grid>
@@ -220,6 +245,22 @@ function App() {
             ))}
           </Box>
     )
+}
+
+function RunPause(props: {running: boolean, onClick: (arg1: boolean) => void}) {
+    if (props.running) {
+        return (
+            <Button aria-label="Pause" onClick={()=>props.onClick(false)}>
+                <PauseIcon fontSize="large" />
+            </Button>
+        )
+    } else {
+        return (
+            <Button aria-label="Animate" onClick={()=>props.onClick(true)}>
+                <PlayArrowIcon fontSize="large" />
+            </Button>
+        )
+    }
 }
 
 export interface Animation {
