@@ -69,9 +69,12 @@ function App(props: {wasm: any}) {
     const [dataLen, setDataLen] = useState(10);
     const [step, setStep] = useState(0);
     const [darkThemeOn, setDarkThemeOn] = useState(false);
+    const classes = useStyles(darkTheme);
+
     React.useEffect(() => {
         generateNewArray(dataLen)
     },[])
+
     const handleThemeChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         setDarkThemeOn(event.target.checked)
     };
@@ -86,6 +89,13 @@ function App(props: {wasm: any}) {
             setAnimationTimeout(newValue);
         }
     };
+    const handleStepChange = (_event: any, newValue: number | number[]) => {
+        if (typeof(newValue) === "number" && newValue != step) {
+            setStep(newValue)
+            setApplicationData(changeToAnimationFrame(newValue, applicationData, values))
+        }
+    };
+
     const runningRef = React.useRef(running)
     runningRef.current = running
     const stepRef = React.useRef(step)
@@ -99,6 +109,7 @@ function App(props: {wasm: any}) {
         runningRef.current = start
         if (start) animate()
     }
+
     const animate = () => {
         if (!runningRef.current) return
         const maxLen = applicationDataRef.current.reduce((max,v) => {
@@ -109,98 +120,40 @@ function App(props: {wasm: any}) {
             setRunning(false)
             return;
         }
-        change_animation(stepRef.current, applicationDataRef.current)
+        setApplicationData(changeToAnimationFrame(stepRef.current, applicationDataRef.current, values))
         setStep(stepRef.current +1)
         setTimeout(animate,animationTimeoutRef.current)
     }
+
     const reset = () => {
         setRunning(false)
         generateNewArray(dataLen)
         setStep(0)
     }
-    const handleStepChange = (_event: any, newValue: number | number[]) => {
-        if (typeof(newValue) === "number" && newValue != step) {
-            setStep(newValue)
-            change_animation(newValue, applicationData)
-        }
-    };
+
     const generateNewArray = (len: number) => {
         const data = generateRandomArray(len, 2*len)
         setValues(data)
         setStep(0)
-        setApplicationData(updateData(data, applicationData))
+        setApplicationData(updateData(data, applicationData, props.wasm))
     }
-    const updateData = (data: number[], oldApplicationData: ApplicationData): ApplicationData => {
-        const newBarChartData = oldApplicationData.slice()
-        newBarChartData.map((el) => {
-            if (el === null) return
-            el.data = data.map((v) => { return { value: v, color: BarColor.Normal } })
-            el.animations = generateAnimations(data, el.algorithm)
-        })
-        return newBarChartData
-    };
-    const classes = useStyles(darkTheme);
-    const generateAnimations = (data: number[], alghoritm: Alghoritm): Animation[] => {
-        const arr = Int32Array.from(data)
-        switch (alghoritm) {
-            case Alghoritm.Heap: {
-                return props.wasm.heap_sort(arr) as Animation[]
-            }
-            case Alghoritm.Bouble: {
-                return props.wasm.bouble_sort(arr) as Animation[]
-            }
-        }
-    }
+
     const selectAlghoritm = (algorithm: Alghoritm | null, idx: number) => {
         let newData = applicationData.slice()
         if (algorithm === null) {
             newData[idx] = null;
         } else {
             newData[idx] = {algorithm, data: [], animations: []}
-            newData = updateData(values, newData)
+            newData = updateData(values, newData, props.wasm)
         }
-        setApplicationData(newData)
-        change_animation(step, newData)
+        setApplicationData(changeToAnimationFrame(step, newData, values))
     }
-    const change_animation = (idx: number, applicationData: ApplicationData) => {
-        const newApplicationData = applicationData.slice()
-        for (const sort of newApplicationData) {
-            if (sort == null) continue
-            const myIdx = Math.min(sort.animations.length -1,idx)
-            const animations = sort.animations
-            const newData = values.map((v) => {
-                const p = {value: v, color: BarColor.Normal}
-                return p
-            });
-            if (animations.length > 0) {
-                for (let i=0;i<myIdx;i++) {
-                    const animation = animations[i]
-                    if (animation.Swap != null) {
-                        const idx1=animation.Swap[0];
-                        const idx2=animation.Swap[1];
-                        [newData[idx1].value,newData[idx2].value] = [newData[idx2].value,newData[idx1].value]
-                    }
-                }
-                const animation = animations[myIdx]
-                if (animation.Compare != null) {
-                    const idx1=animation.Compare[0];
-                    const idx2=animation.Compare[1];
-                    newData[idx1].color = BarColor.CompareLeft
-                    newData[idx2].color = BarColor.CompareRight
-                } else if (animation.Swap != null) {
-                    const idx1=animation.Swap[0];
-                    const idx2=animation.Swap[1];
-                    [newData[idx1].value,newData[idx2].value] = [newData[idx2].value,newData[idx1].value]
-                }
-            }
-            sort.data = newData
-        }
-        setApplicationData(newApplicationData)
-    }
+
     const maxStep = applicationData.reduce((max,v) => {
         if (v === null) return max
         return Math.max(v.animations.length, max)
     }, 0)
+
     return (
         <ThemeProvider theme={darkThemeOn?darkTheme:lightTheme}>
           <CssBaseline />
@@ -300,4 +253,62 @@ function generateRandomArray(len: number, max: number): Array<number> {
         arr.push(n)
     }
     return arr
+}
+
+function generateAnimations(data: number[], alghoritm: Alghoritm, functions: any): Animation[] {
+    const arr = Int32Array.from(data)
+    switch (alghoritm) {
+        case Alghoritm.Heap: {
+            return functions.heap_sort(arr) as Animation[]
+        }
+        case Alghoritm.Bouble: {
+            return functions.bouble_sort(arr) as Animation[]
+        }
+    }
+}
+
+function updateData(data: number[], oldApplicationData: ApplicationData, functions: any): ApplicationData {
+    const newBarChartData = oldApplicationData.slice()
+    newBarChartData.map((el) => {
+        if (el === null) return
+            el.data = data.map((v) => { return { value: v, color: BarColor.Normal } })
+        el.animations = generateAnimations(data, el.algorithm, functions)
+    })
+    return newBarChartData
+};
+
+function changeToAnimationFrame(idx: number, applicationData: ApplicationData, values: number[]): ApplicationData {
+    const newApplicationData = applicationData.slice()
+    for (const sort of newApplicationData) {
+        if (sort == null) continue
+            const myIdx = Math.min(sort.animations.length -1,idx)
+        const animations = sort.animations
+        const newData = values.map((v) => {
+            const p = {value: v, color: BarColor.Normal}
+            return p
+        });
+        if (animations.length > 0) {
+            for (let i=0;i<myIdx;i++) {
+                const animation = animations[i]
+                if (animation.Swap != null) {
+                    const idx1=animation.Swap[0];
+                    const idx2=animation.Swap[1];
+                    [newData[idx1].value,newData[idx2].value] = [newData[idx2].value,newData[idx1].value]
+                }
+            }
+            const animation = animations[myIdx]
+            if (animation.Compare != null) {
+                const idx1=animation.Compare[0];
+                const idx2=animation.Compare[1];
+                newData[idx1].color = BarColor.CompareLeft
+                newData[idx2].color = BarColor.CompareRight
+            } else if (animation.Swap != null) {
+                const idx1=animation.Swap[0];
+                const idx2=animation.Swap[1];
+                [newData[idx1].value,newData[idx2].value] = [newData[idx2].value,newData[idx1].value]
+            }
+        }
+        sort.data = newData
+    }
+    return newApplicationData
 }
