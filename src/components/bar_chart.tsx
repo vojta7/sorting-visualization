@@ -73,8 +73,8 @@ export function BarChart(props: BarChartProps) {
 }
 
 function SelectSort(props: {alghoritms: Map<Alghoritm,string>, onSelect: (arg1: Alghoritm | null) => void}) {
-    let classes = barChartStyles();
-    let [open, setOpen] = useState(false);
+    const classes = barChartStyles();
+    const [open, setOpen] = useState(false);
     const openAlgSelection = (_event: any) => {
         setOpen(true)
     }
@@ -101,10 +101,10 @@ function SelectSort(props: {alghoritms: Map<Alghoritm,string>, onSelect: (arg1: 
 
 
 function BarChartInner(props: {heading: string | undefined, data: BarChartData[], onSelect: (arg1: Alghoritm | null) => void}) {
-    let classes = barChartStyles();
-    let barHeightScale = 100 / Math.max.apply(Math, props.data.map(({value,}) => value))
-    let barWidth = `${90 / props.data.length}%`
-    let marginRight = `${10 / props.data.length}%`
+    const classes = barChartStyles();
+    const barHeightScale = 100 / Math.max.apply(Math, props.data.map(({value,}) => value))
+    const barWidth = `${90 / props.data.length}%`
+    const marginRight = `${10 / props.data.length}%`
         return (
           <div className={classes.root}>
               <Fab className={classes.close} aria-label="remove alghoritm" onClick={() => props.onSelect(null)} >

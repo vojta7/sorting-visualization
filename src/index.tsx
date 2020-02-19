@@ -2,9 +2,8 @@ import * as React from "react";
 import {useState} from "react";
 import * as ReactDOM from "react-dom";
 import {BarChartData, BarColor, BarChart} from "./components/bar_chart";
+import {PauseButton} from "./components/pause_button";
 import {FormControlLabel, Switch,CssBaseline, ThemeProvider, Button, Typography, Slider, Container, Box, Grid} from '@material-ui/core';
-import PlayArrowIcon from '@material-ui/icons/PlayArrow';
-import PauseIcon from '@material-ui/icons/Pause';
 import ReplayIcon from '@material-ui/icons/Replay';
 import { createMuiTheme, makeStyles, createStyles } from '@material-ui/core/styles';
 
@@ -27,6 +26,11 @@ async function run() {
 }
 
 run()
+
+interface Animation {
+    Swap?: [number, number]
+    Compare?: [number, number]
+}
 
 const useStyles = makeStyles(() =>
   createStyles({
@@ -55,10 +59,10 @@ const AvailableAlghoritms: Map<Alghoritm, string> = new Map([
     [Alghoritm.Heap, "Heap Sort"],
 ])
 
-type selectedSort = {alghoritm: Alghoritm, data: BarChartData[], animations: Animation[]} | null
+type ApplicationData = ({algorithm: Alghoritm, data: BarChartData[], animations: Animation[]} | null)[]
 
 function App(props: {wasm: any}) {
-    const [barChartData, setBarChartData] = useState<selectedSort[]>([null, null]);
+    const [applicationData, setApplicationData] = useState<ApplicationData>([null, null]);
     const [values, setValues] = useState<number[]>([]);
     const [running, setRunning] = useState(false);
     const [animationTimeout, setAnimationTimeout] = useState(100);
@@ -82,13 +86,13 @@ function App(props: {wasm: any}) {
             setAnimationTimeout(newValue);
         }
     };
-    let runningRef = React.useRef(running)
+    const runningRef = React.useRef(running)
     runningRef.current = running
-    let stepRef = React.useRef(step)
+    const stepRef = React.useRef(step)
     stepRef.current = step
-    let barChartDataRef = React.useRef(barChartData)
-    barChartDataRef.current = barChartData
-    let animationTimeoutRef = React.useRef(animationTimeout)
+    const applicationDataRef = React.useRef(applicationData)
+    applicationDataRef.current = applicationData
+    const animationTimeoutRef = React.useRef(animationTimeout)
     animationTimeoutRef.current = animationTimeout
     const toggleAnimation = (start: boolean) => {
         setRunning(start)
@@ -97,7 +101,7 @@ function App(props: {wasm: any}) {
     }
     const animate = () => {
         if (!runningRef.current) return
-        let maxLen = barChartDataRef.current.reduce((max,v) => {
+        const maxLen = applicationDataRef.current.reduce((max,v) => {
             if (v === null) return max
             return Math.max(v.animations.length, max)
         }, 0)
@@ -105,7 +109,7 @@ function App(props: {wasm: any}) {
             setRunning(false)
             return;
         }
-        change_animation(stepRef.current, barChartDataRef.current)
+        change_animation(stepRef.current, applicationDataRef.current)
         setStep(stepRef.current +1)
         setTimeout(animate,animationTimeoutRef.current)
     }
@@ -117,27 +121,27 @@ function App(props: {wasm: any}) {
     const handleStepChange = (_event: any, newValue: number | number[]) => {
         if (typeof(newValue) === "number" && newValue != step) {
             setStep(newValue)
-            change_animation(newValue, barChartData)
+            change_animation(newValue, applicationData)
         }
     };
     const generateNewArray = (len: number) => {
-        let data = generateRandomArray(len, 2*len)
+        const data = generateRandomArray(len, 2*len)
         setValues(data)
         setStep(0)
-        setBarChartData(updateData(data, barChartData))
+        setApplicationData(updateData(data, applicationData))
     }
-    const updateData = (data: number[], oldBarChartData: selectedSort[]): selectedSort[] => {
-        let newBarChartData = oldBarChartData.slice()
+    const updateData = (data: number[], oldApplicationData: ApplicationData): ApplicationData => {
+        const newBarChartData = oldApplicationData.slice()
         newBarChartData.map((el) => {
             if (el === null) return
             el.data = data.map((v) => { return { value: v, color: BarColor.Normal } })
-            el.animations = generateAnimations(data, el.alghoritm)
+            el.animations = generateAnimations(data, el.algorithm)
         })
         return newBarChartData
     };
     const classes = useStyles(darkTheme);
     const generateAnimations = (data: number[], alghoritm: Alghoritm): Animation[] => {
-        let arr = Int32Array.from(data)
+        const arr = Int32Array.from(data)
         switch (alghoritm) {
             case Alghoritm.Heap: {
                 return props.wasm.heap_sort(arr) as Animation[]
@@ -147,53 +151,53 @@ function App(props: {wasm: any}) {
             }
         }
     }
-    const selectAlghoritm = (alghoritm: Alghoritm | null, idx: number) => {
-        let newData = barChartData.slice()
-        if (alghoritm === null) {
+    const selectAlghoritm = (algorithm: Alghoritm | null, idx: number) => {
+        let newData = applicationData.slice()
+        if (algorithm === null) {
             newData[idx] = null;
         } else {
-            newData[idx] = {alghoritm, data: [], animations: []}
+            newData[idx] = {algorithm, data: [], animations: []}
             newData = updateData(values, newData)
         }
-        setBarChartData(newData)
+        setApplicationData(newData)
         change_animation(step, newData)
     }
-    const change_animation = (idx: number, barChartData: selectedSort[]) => {
-        let newBarChartData = barChartData.slice()
-        for (let sort of newBarChartData) {
+    const change_animation = (idx: number, applicationData: ApplicationData) => {
+        const newApplicationData = applicationData.slice()
+        for (const sort of newApplicationData) {
             if (sort == null) continue
-            let myIdx = Math.min(sort.animations.length -1,idx)
-            let animations = sort.animations
-            let newData = values.map((v) => {
-                let p = {value: v, color: BarColor.Normal}
+            const myIdx = Math.min(sort.animations.length -1,idx)
+            const animations = sort.animations
+            const newData = values.map((v) => {
+                const p = {value: v, color: BarColor.Normal}
                 return p
             });
             if (animations.length > 0) {
                 for (let i=0;i<myIdx;i++) {
-                    let animation = animations[i]
+                    const animation = animations[i]
                     if (animation.Swap != null) {
-                        let idx1=animation.Swap[0];
-                        let idx2=animation.Swap[1];
+                        const idx1=animation.Swap[0];
+                        const idx2=animation.Swap[1];
                         [newData[idx1].value,newData[idx2].value] = [newData[idx2].value,newData[idx1].value]
                     }
                 }
-                let animation = animations[myIdx]
+                const animation = animations[myIdx]
                 if (animation.Compare != null) {
-                    let idx1=animation.Compare[0];
-                    let idx2=animation.Compare[1];
+                    const idx1=animation.Compare[0];
+                    const idx2=animation.Compare[1];
                     newData[idx1].color = BarColor.CompareLeft
                     newData[idx2].color = BarColor.CompareRight
                 } else if (animation.Swap != null) {
-                    let idx1=animation.Swap[0];
-                    let idx2=animation.Swap[1];
+                    const idx1=animation.Swap[0];
+                    const idx2=animation.Swap[1];
                     [newData[idx1].value,newData[idx2].value] = [newData[idx2].value,newData[idx1].value]
                 }
             }
             sort.data = newData
         }
-        setBarChartData(newBarChartData)
+        setApplicationData(newApplicationData)
     }
-    let maxStep = barChartData.reduce((max,v) => {
+    const maxStep = applicationData.reduce((max,v) => {
         if (v === null) return max
         return Math.max(v.animations.length, max)
     }, 0)
@@ -263,7 +267,7 @@ function App(props: {wasm: any}) {
                      </Grid>
                      <Grid item xs={3} container alignContent="center">
                          <Grid item xs={6}>
-                            <RunPause running={running} onClick={toggleAnimation} />
+                            <PauseButton running={running} onClick={toggleAnimation} />
                          </Grid>
                          <Grid item xs={6}>
                             <Button aria-label="Animate" onClick={reset}>
@@ -274,13 +278,13 @@ function App(props: {wasm: any}) {
                 </Grid>
                </Box>
             </Container>
-            {barChartData.map((chartData, idx) => (
+            {applicationData.map((chartData, idx) => (
                 <Container className={classes.chart} maxWidth={false} key={idx}>
                 <BarChart
                     data={chartData != null ? chartData.data : null}
                     alghoritms={AvailableAlghoritms}
                     onSelect={(alghoritm)=>selectAlghoritm(alghoritm, idx)}
-                    heading={chartData != null ? AvailableAlghoritms.get(chartData.alghoritm) : undefined}
+                    heading={chartData != null ? AvailableAlghoritms.get(chartData.algorithm) : undefined}
                     />
                 </Container>
             ))}
@@ -289,31 +293,10 @@ function App(props: {wasm: any}) {
     )
 }
 
-function RunPause(props: {running: boolean, onClick: (arg1: boolean) => void}) {
-    if (props.running) {
-        return (
-            <Button aria-label="Pause" onClick={()=>props.onClick(false)}>
-                <PauseIcon fontSize="large" />
-            </Button>
-        )
-    } else {
-        return (
-            <Button aria-label="Animate" onClick={()=>props.onClick(true)}>
-                <PlayArrowIcon fontSize="large" />
-            </Button>
-        )
-    }
-}
-
-export interface Animation {
-    Swap?: [number, number]
-    Compare?: [number, number]
-}
-
 function generateRandomArray(len: number, max: number): Array<number> {
-    let arr = new Array()
+    const arr = new Array()
     for (let i=0;i<len;i++) {
-        let n = Math.floor((Math.random() * max) + 1);
+        const n = Math.floor((Math.random() * max) + 1);
         arr.push(n)
     }
     return arr
