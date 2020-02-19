@@ -14,7 +14,8 @@ const barChartStyles = makeStyles(()=> createStyles(
     },
     graph: {
         margin: 0,
-        height: '100%'
+        height: '100%',
+        padding: "0 20px 0 20px"
     },
     heading: {
       "text-align": "center"

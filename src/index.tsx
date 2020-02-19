@@ -40,6 +40,9 @@ const useStyles = makeStyles(() =>
       heading: {
           "text-align": "center"
       },
+      header: {
+          "min-height": "calc(100vh/3)"
+      },
       chart: {
           "height": "calc(100vh/3)", //TODO
           border: "solid 1px black"
@@ -158,7 +161,7 @@ function App(props: {wasm: any}) {
         <ThemeProvider theme={darkThemeOn?darkTheme:lightTheme}>
           <CssBaseline />
           <Box className={classes.content} height="100%">
-            <Container maxWidth={false}>
+            <Container maxWidth={false} className={classes.header}>
                 <Box mt={1} mb={1}>
                  <Grid container spacing={2}>
                      <Grid item xs={2}/>
