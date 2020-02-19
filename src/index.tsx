@@ -201,6 +201,7 @@ function App() {
           <CssBaseline />
           <Box className={classes.content} height="100%">
             <Container maxWidth={false}>
+                <Box mt={1} mb={1}>
                  <Grid container spacing={2}>
                      <Grid item xs={2}/>
                      <Grid item xs={8}>
@@ -270,6 +271,7 @@ function App() {
                          </Grid>
                      </Grid>
                 </Grid>
+               </Box>
             </Container>
             {barChartData.map((chartData, idx) => (
                 <Container className={classes.chart} maxWidth={false} key={idx}>
