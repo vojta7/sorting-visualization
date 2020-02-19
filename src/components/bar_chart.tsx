@@ -92,7 +92,7 @@ function SelectSort(props: {alghoritms: Map<Alghoritm,string>, onSelect: (arg1: 
                     ))}
                 </List>
             </Dialog>
-            <Fab className={classes.select} color="secondary" aria-label="add new sort">
+            <Fab className={classes.select} aria-label="add new sort">
                 <AddCircleIcon fontSize="large" onClick={openAlgSelection} />
             </Fab>
         </div>
@@ -107,7 +107,7 @@ function BarChartInner(props: {heading: string | undefined, data: BarChartData[]
     let marginRight = `${10 / props.data.length}%`
         return (
           <div className={classes.root}>
-              <Fab className={classes.close} color="secondary" aria-label="remove alghoritm" onClick={() => props.onSelect(null)} >
+              <Fab className={classes.close} aria-label="remove alghoritm" onClick={() => props.onSelect(null)} >
                 <CloseIcon fontSize="large" />
               </Fab>
               <Box height={1/4}>

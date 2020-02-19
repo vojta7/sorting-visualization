@@ -2,17 +2,27 @@ import * as React from "react";
 import {useState} from "react";
 import * as ReactDOM from "react-dom";
 import {BarChartData, BarColor, BarChart} from "./components/bar_chart";
-import {Button, Typography, Slider, Container, Box, Grid} from '@material-ui/core';
+import {FormControlLabel, Switch,CssBaseline, ThemeProvider, Button, Typography, Slider, Container, Box, Grid} from '@material-ui/core';
 import PlayArrowIcon from '@material-ui/icons/PlayArrow';
 import PauseIcon from '@material-ui/icons/Pause';
 import ReplayIcon from '@material-ui/icons/Replay';
-import { makeStyles, Theme, createStyles } from '@material-ui/core/styles';
+import { createMuiTheme, makeStyles, Theme, createStyles } from '@material-ui/core/styles';
 
-async function run() {
-    ReactDOM.render(<App /> , document.getElementById("root"));
-}
+const darkTheme = createMuiTheme({
+  palette: {
+    type: 'dark',
+  },
+});
 
-const useStyles = makeStyles((theme: Theme) =>
+const lightTheme = createMuiTheme({
+  palette: {
+    type: 'light',
+  },
+});
+
+async function run() { ReactDOM.render(<App />, document.getElementById("root")); }
+
+const useStyles = makeStyles(() =>
   createStyles({
       content: {
           "min-height": "100vh"
@@ -49,6 +59,10 @@ function App() {
     const [dataLen, setDataLen] = useState(10);
     const [wasm, setWasm] = useState();
     const [step, setStep] = useState(0);
+    const [darkThemeOn, setDarkThemeOn] = useState(false);
+    const handleThemeChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+        setDarkThemeOn(event.target.checked)
+    };
     const handleSizeChange = (_event: any, newValue: number | number[]) => {
         if (typeof(newValue) === "number" && newValue != dataLen) {
             setDataLen(newValue);
@@ -113,7 +127,7 @@ function App() {
         })
         return newBarChartData
     };
-    const classes = useStyles();
+    const classes = useStyles(darkTheme);
     React.useEffect(() => {
         import("../sorting_rust/pkg/sorting")
         .then(wasm => {
@@ -183,11 +197,23 @@ function App() {
         return Math.max(v.animations.length, max)
     }, 0)
     return (
+        <ThemeProvider theme={darkThemeOn?darkTheme:lightTheme}>
+          <CssBaseline />
           <Box className={classes.content} height="100%">
             <Container maxWidth={false}>
                  <Grid container spacing={2}>
-                     <Grid item xs={12}>
+                     <Grid item xs={2}/>
+                     <Grid item xs={8}>
                          <Typography variant="h3" component="h1" className={classes.heading}>Visualization of sorting alghoritms</Typography>
+                     </Grid>
+                     <Grid item xs={2}>
+                     <FormControlLabel
+                          control={<Switch
+                            onChange={handleThemeChange}
+                            value={darkThemeOn}
+                          />}
+                          label="DarkTheme"
+                     />
                      </Grid>
                      <Grid item xs={9} container>
                          <Grid item xs={12} container>
@@ -256,6 +282,7 @@ function App() {
                 </Container>
             ))}
           </Box>
+      </ThemeProvider>
     )
 }
 
