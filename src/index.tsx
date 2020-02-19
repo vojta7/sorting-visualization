@@ -3,8 +3,10 @@ import {useState} from "react";
 import * as ReactDOM from "react-dom";
 import {BarChartData, BarColor, BarChart} from "./components/bar_chart";
 import {PauseButton} from "./components/pause_button";
-import {FormControlLabel, Switch,CssBaseline, ThemeProvider, Button, Typography, Slider, Container, Box, Grid} from '@material-ui/core';
+import {Input, FormControlLabel, Switch,CssBaseline, ThemeProvider, Button, Typography, Slider, Container, Box, Grid} from '@material-ui/core';
 import ReplayIcon from '@material-ui/icons/Replay';
+import SkipNextIcon from '@material-ui/icons/SkipNext';
+import SkipPreviousIcon from '@material-ui/icons/SkipPrevious';
 import { createMuiTheme, makeStyles, createStyles } from '@material-ui/core/styles';
 
 const darkTheme = createMuiTheme({
@@ -41,11 +43,15 @@ const useStyles = makeStyles(() =>
           "text-align": "center"
       },
       header: {
-          "min-height": "calc(100vh/3)"
+          "min-height": "calc(100vh/3)",
+          padding: "20px"
       },
       chart: {
           "height": "calc(100vh/3)", //TODO
           border: "solid 1px black"
+      },
+      input: {
+          width: 42,
       },
   }),
 );
@@ -68,7 +74,7 @@ function App(props: {wasm: any}) {
     const [applicationData, setApplicationData] = useState<ApplicationData>([null, null]);
     const [values, setValues] = useState<number[]>([]);
     const [running, setRunning] = useState(false);
-    const [animationTimeout, setAnimationTimeout] = useState(100);
+    const [animationTimeout, setAnimationTimeout] = useState(500-100);
     const [dataLen, setDataLen] = useState(10);
     const [step, setStep] = useState(0);
     const [darkThemeOn, setDarkThemeOn] = useState(false);
@@ -98,7 +104,6 @@ function App(props: {wasm: any}) {
             setApplicationData(changeToAnimationFrame(newValue, applicationData, values))
         }
     };
-
     const runningRef = React.useRef(running)
     runningRef.current = running
     const stepRef = React.useRef(step)
@@ -107,6 +112,8 @@ function App(props: {wasm: any}) {
     applicationDataRef.current = applicationData
     const animationTimeoutRef = React.useRef(animationTimeout)
     animationTimeoutRef.current = animationTimeout
+    const valuesRef = React.useRef(values)
+    valuesRef.current = values
     const toggleAnimation = (start: boolean) => {
         setRunning(start)
         runningRef.current = start
@@ -123,10 +130,17 @@ function App(props: {wasm: any}) {
             setRunning(false)
             return;
         }
-        setApplicationData(changeToAnimationFrame(stepRef.current, applicationDataRef.current, values))
+        setApplicationData(changeToAnimationFrame(stepRef.current, applicationDataRef.current, valuesRef.current))
         setStep(stepRef.current +1)
-        setTimeout(animate,animationTimeoutRef.current)
+        setTimeout(animate,500-animationTimeoutRef.current)
     }
+
+    const shiftFrame = (amount: number) => {
+        if (stepRef.current + amount < 0) return
+        setRunning(false)
+        changeToAnimationFrame(stepRef.current + amount, applicationDataRef.current, valuesRef.current)
+        setStep(stepRef.current+amount)
+    };
 
     const reset = () => {
         setRunning(false)
@@ -162,7 +176,6 @@ function App(props: {wasm: any}) {
           <CssBaseline />
           <Box className={classes.content} height="100%">
             <Container maxWidth={false} className={classes.header}>
-                <Box mt={1} mb={1}>
                  <Grid container spacing={2}>
                      <Grid item xs={2}/>
                      <Grid item xs={8}>
@@ -177,62 +190,89 @@ function App(props: {wasm: any}) {
                           label="DarkTheme"
                      />
                      </Grid>
-                     <Grid item xs={9} container>
-                         <Grid item xs={12} container>
-                             <Grid item xs={3}><Typography variant="subtitle2">Steps</Typography></Grid>
-                             <Grid item xs>
-                                 <Slider
-                                     onChange={handleStepChange}
-                                     aria-labelledby="discrete-slider"
-                                     valueLabelDisplay="auto"
-                                     step={1}
-                                     min={0}
-                                     max={maxStep}
-                                     value={step}
-                                 />
+                     <Grid item xs={1} />
+                     <Grid item xs={6} container>
+                         <Grid item xs={12} container spacing={2}>
+                             <Grid item xs={1}><Typography variant="subtitle2">Steps</Typography></Grid>
+                             <Grid container item xs={10}>
+                                 <Grid item xs={2}>
+                                 <Button aria-label="Step back" onClick={()=>shiftFrame(-1)} style={{float: "right"}}>
+                                        <SkipPreviousIcon />
+                                    </Button>
+                                 </Grid>
+                                 <Grid item xs={8}>
+                                     <Slider
+                                         onChange={handleStepChange}
+                                         aria-labelledby="discrete-slider"
+                                         valueLabelDisplay="auto"
+                                         step={1}
+                                         min={0}
+                                         max={maxStep}
+                                         value={step}
+                                         />
+                                 </Grid>
+                                 <Grid item xs={2}>
+                                 <Button aria-label="Step forward" onClick={()=>shiftFrame(1)}>
+                                        <SkipNextIcon />
+                                    </Button>
+                                 </Grid>
                              </Grid>
                          </Grid>
-                         <Grid item xs={12} container>
+                         <Grid item xs={12} container spacing={2}>
+                             <Grid item xs={1}><Typography variant="subtitle2">Size</Typography></Grid>
+                             <Grid container item xs={10}>
+                                 <Grid item xs={2}>
+                                 <Button aria-label="Increase size" onClick={()=>{/*TODO*/}} style={{float: "right"}}>
+                                        <SkipPreviousIcon />
+                                    </Button>
+                                 </Grid>
+                                 <Grid item xs={8}>
+                                     <Slider
+                                         onChange={handleSizeChange}
+                                         aria-labelledby="discrete-slider"
+                                         valueLabelDisplay="auto"
+                                         step={1}
+                                         min={10}
+                                         max={100}
+                                         value={dataLen}
+                                     />
+                                 </Grid>
+                                 <Grid item xs={2}>
+                                 <Button aria-label="Decrease size" onClick={()=>{/*TODO*/}}>
+                                        <SkipNextIcon />
+                                    </Button>
+                                 </Grid>
+                             </Grid>
+                         </Grid>
+                     </Grid>
+                     <Grid item xs={4} container alignContent="center">
+                         <Grid item xs={12} container spacing={2}>
                              <Grid item xs={3}><Typography variant="subtitle2">Speed</Typography></Grid>
-                             <Grid item xs>
+                             <Grid item xs={8}>
                                  <Slider
                                      onChange={handleSpeedChange}
                                      aria-labelledby="discrete-slider"
-                                     valueLabelDisplay="auto"
+                                     valueLabelDisplay="off"
                                      value={animationTimeout}
                                      step={5}
-                                     min={5}
-                                     max={1000}
+                                     min={0}
+                                     max={495}
                                  />
                              </Grid>
                          </Grid>
-                         <Grid item xs={12} container>
-                             <Grid item xs={3}><Typography variant="subtitle2">Size</Typography></Grid>
-                             <Grid item xs>
-                                 <Slider
-                                     onChange={handleSizeChange}
-                                     aria-labelledby="discrete-slider"
-                                     valueLabelDisplay="auto"
-                                     step={1}
-                                     min={10}
-                                     max={100}
-                                     value={dataLen}
-                                 />
+                         <Grid item xs={12} container spacing={2}>
+                             <Grid item xs={3}/>
+                             <Grid item xs={4}>
+                                <PauseButton running={running} onClick={toggleAnimation} />
                              </Grid>
-                         </Grid>
-                     </Grid>
-                     <Grid item xs={3} container alignContent="center">
-                         <Grid item xs={6}>
-                            <PauseButton running={running} onClick={toggleAnimation} />
-                         </Grid>
-                         <Grid item xs={6}>
-                            <Button aria-label="Animate" onClick={reset}>
-                                <ReplayIcon fontSize="large" />
-                            </Button>
+                             <Grid item xs={4}>
+                                <Button aria-label="Animate" onClick={reset}>
+                                    <ReplayIcon fontSize="large" />
+                                </Button>
+                             </Grid>
                          </Grid>
                      </Grid>
                 </Grid>
-               </Box>
             </Container>
             {applicationData.map((chartData, idx) => (
                 <Container className={classes.chart} maxWidth={false} key={idx}>
