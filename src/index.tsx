@@ -33,11 +33,11 @@ export enum Alghoritm {
     Heap
 }
 
-const AvailableAlghoritms: [Alghoritm, string][] = [
+const AvailableAlghoritms: Map<Alghoritm, string> = new Map([
     [Alghoritm.Bouble, "Bouble Sort"],
     //[Alghoritm.Quick, "Quick Sort"],
-    [Alghoritm.Heap, "Heap Sort"]
-]
+    [Alghoritm.Heap, "Heap Sort"],
+])
 
 type selectedSort = {alghoritm: Alghoritm, data: BarChartData[], animations: Animation[]} | null
 
@@ -99,7 +99,7 @@ function App() {
         }
     };
     const generateNewArray = (len: number) => {
-        let data = generateRandomArray(len, 10)
+        let data = generateRandomArray(len, 2*len)
         setValues(data)
         setStep(0)
         setBarChartData(updateData(data, barChartData))
@@ -250,7 +250,9 @@ function App() {
                 <BarChart
                     data={chartData != null ? chartData.data : null}
                     alghoritms={AvailableAlghoritms}
-                    onSelect={(alghoritm)=>selectAlghoritm(alghoritm, idx)} />
+                    onSelect={(alghoritm)=>selectAlghoritm(alghoritm, idx)}
+                    heading={chartData != null ? AvailableAlghoritms.get(chartData.alghoritm) : undefined}
+                    />
                 </Container>
             ))}
           </Box>
