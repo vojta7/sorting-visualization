@@ -6,7 +6,7 @@ import {FormControlLabel, Switch,CssBaseline, ThemeProvider, Button, Typography,
 import PlayArrowIcon from '@material-ui/icons/PlayArrow';
 import PauseIcon from '@material-ui/icons/Pause';
 import ReplayIcon from '@material-ui/icons/Replay';
-import { createMuiTheme, makeStyles, Theme, createStyles } from '@material-ui/core/styles';
+import { createMuiTheme, makeStyles, createStyles } from '@material-ui/core/styles';
 
 const darkTheme = createMuiTheme({
   palette: {
@@ -20,7 +20,13 @@ const lightTheme = createMuiTheme({
   },
 });
 
-async function run() { ReactDOM.render(<App />, document.getElementById("root")); }
+async function run() {
+    let wasm = await import("../sorting_rust/pkg/sorting")
+    wasm.init()
+    ReactDOM.render(<App wasm={wasm}/>, document.getElementById("root"));
+}
+
+run()
 
 const useStyles = makeStyles(() =>
   createStyles({
@@ -51,15 +57,17 @@ const AvailableAlghoritms: Map<Alghoritm, string> = new Map([
 
 type selectedSort = {alghoritm: Alghoritm, data: BarChartData[], animations: Animation[]} | null
 
-function App() {
+function App(props: {wasm: any}) {
     const [barChartData, setBarChartData] = useState<selectedSort[]>([null, null]);
     const [values, setValues] = useState<number[]>([]);
     const [running, setRunning] = useState(false);
     const [animationTimeout, setAnimationTimeout] = useState(100);
     const [dataLen, setDataLen] = useState(10);
-    const [wasm, setWasm] = useState();
     const [step, setStep] = useState(0);
     const [darkThemeOn, setDarkThemeOn] = useState(false);
+    React.useEffect(() => {
+        generateNewArray(dataLen)
+    },[])
     const handleThemeChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         setDarkThemeOn(event.target.checked)
     };
@@ -128,21 +136,14 @@ function App() {
         return newBarChartData
     };
     const classes = useStyles(darkTheme);
-    React.useEffect(() => {
-        import("../sorting_rust/pkg/sorting")
-        .then(wasm => {
-            wasm.init()
-            setWasm(wasm)
-        })
-    },[])
     const generateAnimations = (data: number[], alghoritm: Alghoritm): Animation[] => {
         let arr = Int32Array.from(data)
         switch (alghoritm) {
             case Alghoritm.Heap: {
-                return wasm.heap_sort(arr) as Animation[]
+                return props.wasm.heap_sort(arr) as Animation[]
             }
             case Alghoritm.Bouble: {
-                return wasm.bouble_sort(arr) as Animation[]
+                return props.wasm.bouble_sort(arr) as Animation[]
             }
         }
     }
@@ -317,5 +318,3 @@ function generateRandomArray(len: number, max: number): Array<number> {
     }
     return arr
 }
-
-run()
