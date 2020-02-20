@@ -32,12 +32,12 @@ const lightTheme = createMuiTheme({
 });
 
 async function run() {
-    let wasm = await import("../sorting_rust/pkg/sorting")
-    wasm.init()
+    let wasm = await import("../sorting_rust/pkg/sorting");
+    wasm.init();
     ReactDOM.render(<App wasm={wasm}/>, document.getElementById("root"));
 }
 
-run()
+run();
 
 interface Animation {
     Swap?: [number, number]
@@ -84,7 +84,7 @@ const AvailableAlgorithms: Map<Algorithm, string> = new Map([
     [Algorithm.Heap2, "Heapsort (Floyd's heap construction)"],
     [Algorithm.Bouble, "Bouble sort"],
     [Algorithm.Shake, "Shake sort"],
-])
+]);
 
 type ApplicationData = ({ algorithm: Algorithm, data: BarChartData[], animations: Animation[] } | null)[]
 
@@ -106,20 +106,20 @@ function App(props: { wasm: any }) {
 
     React.useEffect(() => {
         generateNewArray(dataLen)
-    }, [])
+    }, []);
 
     const handleThemeChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         setDarkThemeOn(event.target.checked)
     };
-    const dataLenRef = React.useRef(dataLen)
-    dataLenRef.current = dataLen
+    const dataLenRef = React.useRef(dataLen);
+    dataLenRef.current = dataLen;
     const handleSizeIncrease = (increase: number) => {
         let newLen = dataLenRef.current + increase;
         if (newLen <= maxDataLen && newLen >= minDataLen) {
             setDataLen(newLen);
             generateNewArray(newLen);
         }
-    }
+    };
     const handleSizeChange = (_event: any, newValue: number | number[]) => {
         if (typeof (newValue) === "number" && newValue != dataLen) {
             if (newValue <= maxDataLen && newValue >= minDataLen) {
@@ -135,76 +135,76 @@ function App(props: { wasm: any }) {
     };
     const handleStepChange = (_event: any, newValue: number | number[]) => {
         if (typeof (newValue) === "number" && newValue != step) {
-            setStep(newValue)
+            setStep(newValue);
             setApplicationData(changeToAnimationFrame(newValue, applicationData, values))
         }
     };
-    const runningRef = React.useRef(running)
-    runningRef.current = running
-    const stepRef = React.useRef(step)
-    stepRef.current = step
-    const applicationDataRef = React.useRef(applicationData)
-    applicationDataRef.current = applicationData
-    const animationTimeoutRef = React.useRef(animationTimeout)
-    animationTimeoutRef.current = animationTimeout
-    const valuesRef = React.useRef(values)
-    valuesRef.current = values
+    const runningRef = React.useRef(running);
+    runningRef.current = running;
+    const stepRef = React.useRef(step);
+    stepRef.current = step;
+    const applicationDataRef = React.useRef(applicationData);
+    applicationDataRef.current = applicationData;
+    const animationTimeoutRef = React.useRef(animationTimeout);
+    animationTimeoutRef.current = animationTimeout;
+    const valuesRef = React.useRef(values);
+    valuesRef.current = values;
     const toggleAnimation = (start: boolean) => {
-        setRunning(start)
-        runningRef.current = start
+        setRunning(start);
+        runningRef.current = start;
         if (start) animate()
-    }
+    };
 
     const animate = () => {
-        if (!runningRef.current) return
+        if (!runningRef.current) return;
         const maxLen = applicationDataRef.current.reduce((max, v) => {
-            if (v === null) return max
+            if (v === null) return max;
             return Math.max(v.animations.length, max)
-        }, 0)
+        }, 0);
         if (stepRef.current >= maxLen) {
-            setRunning(false)
+            setRunning(false);
             return;
         }
-        setApplicationData(changeToAnimationFrame(stepRef.current, applicationDataRef.current, valuesRef.current))
-        setStep(stepRef.current + 1)
+        setApplicationData(changeToAnimationFrame(stepRef.current, applicationDataRef.current, valuesRef.current));
+        setStep(stepRef.current + 1);
         setTimeout(animate, maxAnimationTimeout - animationTimeoutRef.current)
-    }
+    };
 
     const shiftFrame = (amount: number) => {
-        if (stepRef.current + amount < 0) return
-        setRunning(false)
-        changeToAnimationFrame(stepRef.current + amount, applicationDataRef.current, valuesRef.current)
+        if (stepRef.current + amount < 0) return;
+        setRunning(false);
+        changeToAnimationFrame(stepRef.current + amount, applicationDataRef.current, valuesRef.current);
         setStep(stepRef.current + amount)
     };
 
     const reset = () => {
-        setRunning(false)
-        generateNewArray(dataLen)
+        setRunning(false);
+        generateNewArray(dataLen);
         setStep(0)
-    }
+    };
 
     const generateNewArray = (len: number) => {
-        const data = generateRandomArray(len, 2 * len)
-        setValues(data)
-        setStep(0)
+        const data = generateRandomArray(len, 2 * len);
+        setValues(data);
+        setStep(0);
         setApplicationData(updateData(data, applicationData, props.wasm))
-    }
+    };
 
     const selectAlgorithm = (algorithm: Algorithm | null, idx: number) => {
-        let newData = applicationData.slice()
+        let newData = applicationData.slice();
         if (algorithm === null) {
             newData[idx] = null;
         } else {
-            newData[idx] = {algorithm, data: [], animations: []}
+            newData[idx] = {algorithm, data: [], animations: []};
             newData = updateData(values, newData, props.wasm)
         }
         setApplicationData(changeToAnimationFrame(step, newData, values))
-    }
+    };
 
     const maxStep = applicationData.reduce((max, v) => {
-        if (v === null) return max
+        if (v === null) return max;
         return Math.max(v.animations.length, max)
-    }, 0)
+    }, 0);
 
     return (
         <ThemeProvider theme={darkThemeOn ? darkTheme : lightTheme}>
@@ -294,7 +294,7 @@ function App(props: { wasm: any }) {
 }
 
 function generateRandomArray(len: number, max: number): Array<number> {
-    const arr = new Array()
+    const arr = new Array();
     for (let i = 0; i < len; i++) {
         const n = Math.floor((Math.random() * max) + 1);
         arr.push(n)
@@ -303,7 +303,7 @@ function generateRandomArray(len: number, max: number): Array<number> {
 }
 
 function generateAnimations(data: number[], algorithm: Algorithm, functions: any): Animation[] {
-    const arr = Int32Array.from(data)
+    const arr = Int32Array.from(data);
     switch (algorithm) {
         case Algorithm.Heap: {
             return functions.heap_sort(arr) as Animation[]
@@ -327,32 +327,32 @@ function generateAnimations(data: number[], algorithm: Algorithm, functions: any
 }
 
 function updateData(data: number[], oldApplicationData: ApplicationData, functions: any): ApplicationData {
-    const newBarChartData = oldApplicationData.slice()
+    const newBarChartData = oldApplicationData.slice();
     newBarChartData.map((el) => {
-        if (el === null) return
+        if (el === null) return;
         el.data = data.map((v) => {
             return {value: v, color: BarColor.Normal}
-        })
+        });
         el.animations = generateAnimations(data, el.algorithm, functions)
-    })
+    });
     return newBarChartData
 };
 
 function changeToAnimationFrame(idx: number, applicationData: ApplicationData, values: number[]): ApplicationData {
-    const newApplicationData = applicationData.slice()
+    const newApplicationData = applicationData.slice();
     for (const sort of newApplicationData) {
-        if (sort === null) continue
-        const myIdx = Math.min(sort.animations.length - 1, idx)
-        const animations = sort.animations
-        let resetColor = myIdx < idx || myIdx == sort.animations.length - 1 ? BarColor.Finished : BarColor.Normal
+        if (sort === null) continue;
+        const myIdx = Math.min(sort.animations.length - 1, idx);
+        const animations = sort.animations;
+        let resetColor = myIdx < idx || myIdx == sort.animations.length - 1 ? BarColor.Finished : BarColor.Normal;
         const newData = values.map((v) => {
-            const p = {value: v, color: resetColor}
+            const p = {value: v, color: resetColor};
             return p
         });
         if (animations.length > 0) {
-            let lastCompare = null
+            let lastCompare = null;
             for (let i = 0; i < myIdx; i++) {
-                const animation = animations[i]
+                const animation = animations[i];
                 if (animation.Swap !== null) {
                     applySwap(animation.Swap[0], animation.Swap[1], newData)
                 } else if (animation.Compare !== null) {
@@ -361,7 +361,7 @@ function changeToAnimationFrame(idx: number, applicationData: ApplicationData, v
                     newData[animation.Set[0]].value = animation.Set[1]
                 }
             }
-            const animation = animations[myIdx]
+            const animation = animations[myIdx];
             if (animation.Compare !== null && myIdx != sort.animations.length - 1) {
                 applyCompare(animation.Compare[0], animation.Compare[1], newData)
             } else if (animation.Swap !== null) {
@@ -379,8 +379,8 @@ function changeToAnimationFrame(idx: number, applicationData: ApplicationData, v
 }
 
 function applyCompare(idx1: number, idx2: number, data: BarChartData[]) {
-    console.log(`${idx1} ${idx2}`)
-    data[idx1].color = BarColor.Compare
+    console.log(`${idx1} ${idx2}`);
+    data[idx1].color = BarColor.Compare;
     data[idx2].color = BarColor.Compare
 }
 

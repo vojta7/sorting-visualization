@@ -82,14 +82,14 @@ function SelectSort(props: { algorithms: Map<Algorithm, string>, onSelect: (arg1
     const [open, setOpen] = useState(false);
     const openAlgSelection = (_event: any) => {
         setOpen(true)
-    }
+    };
     return (
         <div className={classes.root}>
             <Dialog open={open}>
                 <List>
                     {[...props.algorithms].map(([al, name]) => (
                         <ListItem button key={al.toString()} onClick={() => {
-                            setOpen(false)
+                            setOpen(false);
                             props.onSelect(al)
                         }}>
                             <ListItemText primary={name}/>
@@ -107,9 +107,9 @@ function SelectSort(props: { algorithms: Map<Algorithm, string>, onSelect: (arg1
 
 function BarChartInner(props: { heading: string | undefined, data: BarChartData[], onSelect: (arg1: Algorithm | null) => void }) {
     const classes = barChartStyles();
-    const barHeightScale = 100 / Math.max.apply(Math, props.data.map(({value,}) => value))
-    const barWidth = `${90 / props.data.length}%`
-    const marginRight = `${10 / props.data.length}%`
+    const barHeightScale = 100 / Math.max.apply(Math, props.data.map(({value,}) => value));
+    const barWidth = `${90 / props.data.length}%`;
+    const marginRight = `${10 / props.data.length}%`;
     return (
         <div className={classes.root}>
             <Fab className={classes.close} aria-label="remove algorithm" onClick={() => props.onSelect(null)}>
@@ -130,7 +130,7 @@ function BarChartInner(props: { heading: string | undefined, data: BarChartData[
                             } else {
                                 barClass = classes.normal
                             }
-                            let className = classes.bar + " " + barClass
+                            let className = classes.bar + " " + barClass;
                             return (
                                 <div
                                     className={className}
