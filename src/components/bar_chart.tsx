@@ -70,7 +70,7 @@ export interface BarChartProps {
 }
 
 export function BarChart(props: BarChartProps) {
-    if (props.data != null) {
+    if (props.data !== null) {
         return (<BarChartInner data={props.data} onSelect={props.onSelect} heading={props.heading}/>)
     } else {
         return (<SelectSort onSelect={props.onSelect} algorithms={props.algorithms}/>)
@@ -139,7 +139,7 @@ function BarChartInner(props: { heading: string | undefined, data: BarChartData[
                                         height: `${barHeightScale * value}%`,
                                         width: barWidth,
                                         marginRight: marginRight
-                                    }}></div>
+                                    }}/>
                             )
                         })}
                 </ul>
