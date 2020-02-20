@@ -20,11 +20,11 @@ const barChartStyles = makeStyles(()=> createStyles(
     heading: {
       "text-align": "center"
     },
-    compare1: {
-      backgroundColor: "red",
-    },
-    compare2: {
+    compare: {
       backgroundColor: "blue",
+    },
+    finished: {
+      backgroundColor: "green",
     },
     normal: {
       backgroundColor: "rebeccapurple",
@@ -53,8 +53,8 @@ const barChartStyles = makeStyles(()=> createStyles(
 
 export enum BarColor {
     Normal,
-    CompareLeft,
-    CompareRight,
+    Compare,
+    Finished
 }
 
 export interface BarChartData { value: number,color: BarColor }
@@ -119,8 +119,8 @@ function BarChartInner(props: {heading: string | undefined, data: BarChartData[]
                   {props.data
                       .map(({value, color}, idx) => {
                           let barClass;
-                          if (color == BarColor.CompareLeft) {barClass = classes.compare1}
-                          else if (color == BarColor.CompareRight) {barClass = classes.compare2}
+                          if (color == BarColor.Compare) {barClass = classes.compare}
+                          else if (color == BarColor.Finished) {barClass = classes.finished}
                           else {barClass = classes.normal}
                           let className = classes.bar + " " + barClass
                        return (
