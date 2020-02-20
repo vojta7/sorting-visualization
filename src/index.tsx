@@ -37,17 +37,18 @@ interface Animation {
 const useStyles = makeStyles(() =>
   createStyles({
       content: {
-          "min-height": "100vh"
+          "min-height": "100vh",
+          padding: "20px 0 20px 0"
       },
       heading: {
           "text-align": "center"
       },
       header: {
-          "min-height": "calc(100vh/3)",
-          padding: "20px"
+          "min-height": "calc(100vh/5)",
       },
       chart: {
-          "height": "calc(100vh/3)", //TODO
+          "min-height": "calc(100vh/4)", //TODO
+          height: "16em",
           border: "solid 1px black"
       },
       input: {
@@ -210,7 +211,7 @@ function App(props: {wasm: any}) {
                             onChange={handleThemeChange}
                             value={darkThemeOn}
                           />}
-                          label="dark theme"
+                          label="Dark theme"
                      />
                      </Grid>
                      <Grid item xs={1} />

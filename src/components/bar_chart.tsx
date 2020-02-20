@@ -18,7 +18,8 @@ const barChartStyles = makeStyles(()=> createStyles(
         padding: "0 20px 0 20px"
     },
     heading: {
-      "text-align": "center"
+        "text-align": "center",
+        paddingTop: '0.25em'
     },
     compare: {
       backgroundColor: "blue",
@@ -31,7 +32,7 @@ const barChartStyles = makeStyles(()=> createStyles(
     },
     root: {
         position: 'relative',
-        height: '100%'
+        height: '100%',
     },
     close: {
         margin: 0,
@@ -94,7 +95,7 @@ function SelectSort(props: {algorithms: Map<Algorithm,string>, onSelect: (arg1: 
                 </List>
             </Dialog>
             <Fab className={classes.select} aria-label="add new sort">
-                <AddCircleIcon fontSize="large" onClick={openAlgSelection} />
+                <AddCircleIcon onClick={openAlgSelection} />
             </Fab>
         </div>
     )
@@ -109,7 +110,7 @@ function BarChartInner(props: {heading: string | undefined, data: BarChartData[]
         return (
           <div className={classes.root}>
               <Fab className={classes.close} aria-label="remove algorithm" onClick={() => props.onSelect(null)} >
-                <CloseIcon fontSize="large" />
+                <CloseIcon />
               </Fab>
               <Box height={1/4}>
                   <Typography variant="h4" component="h3" className={classes.heading}>{props.heading}</Typography>
