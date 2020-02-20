@@ -11,7 +11,7 @@ fn right_child(idx: usize) -> usize {
 }
 
 #[inline(always)]
-fn parrent(idx: usize) -> usize {
+fn parent(idx: usize) -> usize {
     (idx-1)/2
 }
 
@@ -22,10 +22,10 @@ fn parrent(idx: usize) -> usize {
 /// space: O(1)
 /// not stable
 ///
-/// constructs max heap inplace and then extracts max elemenets placing them to the end of array
+/// constructs max heap in place and then extracts max elements placing them to the end of array
 pub fn heap_sort_inner(arr:&mut [i32], animations: &mut Vec<Animation>) {
     for i in 1..arr.len() {
-        bouble_up(&mut arr[..=i], animations);
+        bubble_up(&mut arr[..=i], animations);
     }
     for i in (0..arr.len()).rev() {
         extract_min(&mut arr[..=i], animations);
@@ -33,17 +33,17 @@ pub fn heap_sort_inner(arr:&mut [i32], animations: &mut Vec<Animation>) {
 }
 
 
-fn bouble_up(arr: &mut[i32], animations: &mut Vec<Animation>) {
+fn bubble_up(arr: &mut[i32], animations: &mut Vec<Animation>) {
     let mut idx = arr.len()-1;
     loop {
         if idx < 1 { break }
-        let parrent_idx = parrent(idx);
-        animations.push(Animation::Compare(parrent_idx,idx));
-        if arr[parrent_idx] < arr[idx] {
-            animations.push(Animation::Swap(parrent_idx,idx));
-            arr.swap(parrent_idx,idx);
+        let parent_idx = parent(idx);
+        animations.push(Animation::Compare(parent_idx,idx));
+        if arr[parent_idx] < arr[idx] {
+            animations.push(Animation::Swap(parent_idx,idx));
+            arr.swap(parent_idx,idx);
         }
-        idx = parrent_idx;
+        idx = parent_idx;
     }
 }
 
@@ -51,10 +51,10 @@ fn extract_min(arr: &mut[i32], animations: &mut Vec<Animation>) {
     let new_len = arr.len()-1;
     animations.push(Animation::Swap(0,new_len));
     arr.swap(0, new_len);
-    bouble_down(&mut arr[..new_len], 0, animations);
+    bubble_down(&mut arr[..new_len], 0, animations);
 }
 
-fn bouble_down(arr: &mut[i32], idx: usize, animations: &mut Vec<Animation>) {
+fn bubble_down(arr: &mut[i32], idx: usize, animations: &mut Vec<Animation>) {
     if arr.len() <= left_child(idx) { return }
     if arr.len() <= right_child(idx) {
         animations.push(Animation::Compare(left_child(idx),idx));
@@ -77,7 +77,7 @@ fn bouble_down(arr: &mut[i32], idx: usize, animations: &mut Vec<Animation>) {
         if arr[max] > arr[idx] {
             animations.push(Animation::Swap(max,idx));
             arr.swap(max,idx);
-            bouble_down(arr, max, animations);
+            bubble_down(arr, max, animations);
         }
     }
 }
@@ -88,7 +88,7 @@ fn bouble_down(arr: &mut[i32], idx: usize, animations: &mut Vec<Animation>) {
 /// space: O(1)
 /// not stable
 ///
-/// constructs max heap in linear time from bottom up using sift_down and then extracts max elemenets placing them to the end of array
+/// constructs max heap in linear time from bottom up using sift_down and then extracts max elements placing them to the end of array
 pub fn heap_sort2_inner(arr:&mut [i32], animations: &mut Vec<Animation>) {
     for i in (0..arr.len()/2).rev() {
         sift_down(arr, i, animations);
@@ -128,7 +128,7 @@ fn sift_down(arr: &mut[i32], idx: usize, animations: &mut Vec<Animation>) {
     let mut j = leaf_search(arr, idx, animations);
     animations.push(Animation::Compare(idx,j));
     while arr[idx] > arr[j] {
-        j = parrent(j);
+        j = parent(j);
         animations.push(Animation::Compare(idx,j));
     }
     let mut x = arr[j];
@@ -136,7 +136,7 @@ fn sift_down(arr: &mut[i32], idx: usize, animations: &mut Vec<Animation>) {
     animations.push(Animation::Set(j,arr[idx]));
     animations.push(Animation::Compare(j,idx));
     while j > idx {
-        j = parrent(j);
+        j = parent(j);
         animations.push(Animation::Set(j,x));
         std::mem::swap(&mut x, &mut arr[j]);
     }
