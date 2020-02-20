@@ -51,6 +51,14 @@ pub fn heap_sort(array: &[i32]) -> JsValue {
 }
 
 #[wasm_bindgen]
+pub fn heap_sort2(array: &[i32]) -> JsValue {
+    let mut arr = array.to_owned();
+    let mut animations = Vec::new();
+    heap_sort2_inner(&mut arr, &mut animations);
+    JsValue::from_serde(&animations).unwrap()
+}
+
+#[wasm_bindgen]
 pub fn quick_sort(array: &[i32]) -> JsValue {
     let mut arr = array.to_owned();
     let mut animations = Vec::new();
@@ -94,6 +102,13 @@ mod test {
         let mut arr = [ 4, 5, 9, 1, 2, 4, 5, 7, 7, 1 ];
         let mut animations = Vec::new();
         heap_sort_inner(&mut arr, &mut animations);
+        assert_eq!(arr.as_ref(), [1,1,2,4,4,5,5,7,7,9]);
+    }
+    #[test]
+    fn test_heap_sort2() {
+        let mut arr = [ 4, 5, 9, 1, 2, 4, 5, 7, 7, 1 ];
+        let mut animations = Vec::new();
+        heap_sort2_inner(&mut arr, &mut animations);
         assert_eq!(arr.as_ref(), [1,1,2,4,4,5,5,7,7,9]);
     }
     #[test]

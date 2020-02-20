@@ -61,14 +61,16 @@ export enum Alghoritm {
     Quick,
     Heap,
     Merge,
-    Shake
+    Shake,
+    Heap2,
 }
 
 const AvailableAlghoritms: Map<Alghoritm, string> = new Map([
-    [Alghoritm.Bouble, "Bouble Sort"],
     [Alghoritm.Quick, "Quick Sort"],
-    [Alghoritm.Heap, "Heap Sort"],
     [Alghoritm.Merge, "Merge Sort"],
+    [Alghoritm.Heap, "Heap Sort"],
+    [Alghoritm.Heap2, "Heap Sort (Floyd's heap construction)"],
+    [Alghoritm.Bouble, "Bouble Sort"],
     [Alghoritm.Shake, "Shake Sort"],
 ])
 
@@ -302,6 +304,9 @@ function generateAnimations(data: number[], alghoritm: Alghoritm, functions: any
         }
         case Alghoritm.Shake: {
             return functions.shake_sort(arr) as Animation[]
+        }
+        case Alghoritm.Heap2: {
+            return functions.heap_sort2(arr) as Animation[]
         }
     }
 }
