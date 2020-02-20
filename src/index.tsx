@@ -66,12 +66,12 @@ export enum Algorithm {
 }
 
 const AvailableAlgorithms: Map<Algorithm, string> = new Map([
-    [Algorithm.Quick, "Quick Sort"],
-    [Algorithm.Merge, "Merge Sort"],
-    [Algorithm.Heap, "Heap Sort"],
-    [Algorithm.Heap2, "Heap Sort (Floyd's heap construction)"],
-    [Algorithm.Bouble, "Bouble Sort"],
-    [Algorithm.Shake, "Shake Sort"],
+    [Algorithm.Quick, "Quicksort"],
+    [Algorithm.Merge, "Merge sort"],
+    [Algorithm.Heap, "Heapsort"],
+    [Algorithm.Heap2, "Heapsort (Floyd's heap construction)"],
+    [Algorithm.Bouble, "Bouble sort"],
+    [Algorithm.Shake, "Shake sort"],
 ])
 
 type ApplicationData = ({algorithm: Algorithm, data: BarChartData[], animations: Animation[]} | null)[]
@@ -210,13 +210,13 @@ function App(props: {wasm: any}) {
                             onChange={handleThemeChange}
                             value={darkThemeOn}
                           />}
-                          label="DarkTheme"
+                          label="dark theme"
                      />
                      </Grid>
                      <Grid item xs={1} />
                      <Grid item xs={6} container>
                          <SliderWithButtons 
-                                name="Steps"
+                                name="steps"
                                 xs={12}
                                 step={1}
                                 min={0}
@@ -226,7 +226,7 @@ function App(props: {wasm: any}) {
                                 handleButtonPress={shiftFrame}
                          />
                          <SliderWithButtons 
-                                name="Size"
+                                name="size"
                                 xs={12}
                                 step={1}
                                 min={10}
@@ -238,7 +238,7 @@ function App(props: {wasm: any}) {
                      </Grid>
                      <Grid item xs={4} container alignContent="center">
                          <Grid item xs={12} container spacing={2}>
-                             <Grid item xs={3}><Typography variant="subtitle2">Speed</Typography></Grid>
+                             <Grid item xs={3}><Typography variant="subtitle2">speed</Typography></Grid>
                              <Grid item xs={8}>
                                  <Slider
                                      onChange={handleSpeedChange}
