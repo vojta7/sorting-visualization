@@ -2,11 +2,10 @@ import * as React from "react";
 import {useState} from "react";
 import * as ReactDOM from "react-dom";
 import {BarChartData, BarColor, BarChart} from "./components/bar_chart";
+import {SliderWithButtons} from "./components/slider_with_buttons";
 import {PauseButton} from "./components/pause_button";
-import {Input, FormControlLabel, Switch,CssBaseline, ThemeProvider, Button, Typography, Slider, Container, Box, Grid} from '@material-ui/core';
+import {FormControlLabel, Switch,CssBaseline, ThemeProvider, Button, Typography, Slider, Container, Box, Grid} from '@material-ui/core';
 import ReplayIcon from '@material-ui/icons/Replay';
-import SkipNextIcon from '@material-ui/icons/SkipNext';
-import SkipPreviousIcon from '@material-ui/icons/SkipPrevious';
 import { createMuiTheme, makeStyles, createStyles } from '@material-ui/core/styles';
 
 const darkTheme = createMuiTheme({
@@ -209,58 +208,24 @@ function App(props: {wasm: any}) {
                      </Grid>
                      <Grid item xs={1} />
                      <Grid item xs={6} container>
-                         <Grid item xs={12} container spacing={2}>
-                             <Grid item xs={1}><Typography variant="subtitle2">Steps</Typography></Grid>
-                             <Grid container item xs={10}>
-                                 <Grid item xs={2}>
-                                 <Button aria-label="Step back" onClick={()=>shiftFrame(-1)} style={{float: "right"}}>
-                                        <SkipPreviousIcon />
-                                    </Button>
-                                 </Grid>
-                                 <Grid item xs={8}>
-                                     <Slider
-                                         onChange={handleStepChange}
-                                         aria-labelledby="discrete-slider"
-                                         valueLabelDisplay="auto"
-                                         step={1}
-                                         min={0}
-                                         max={maxStep}
-                                         value={step}
-                                         />
-                                 </Grid>
-                                 <Grid item xs={2}>
-                                 <Button aria-label="Step forward" onClick={()=>shiftFrame(1)}>
-                                        <SkipNextIcon />
-                                    </Button>
-                                 </Grid>
-                             </Grid>
-                         </Grid>
-                         <Grid item xs={12} container spacing={2}>
-                             <Grid item xs={1}><Typography variant="subtitle2">Size</Typography></Grid>
-                             <Grid container item xs={10}>
-                                 <Grid item xs={2}>
-                                 <Button aria-label="Increase size" onClick={()=>handleSizeIncrease(-1)} style={{float: "right"}}>
-                                        <SkipPreviousIcon />
-                                    </Button>
-                                 </Grid>
-                                 <Grid item xs={8}>
-                                     <Slider
-                                         onChange={handleSizeChange}
-                                         aria-labelledby="discrete-slider"
-                                         valueLabelDisplay="auto"
-                                         step={1}
-                                         min={10}
-                                         max={100}
-                                         value={dataLen}
-                                     />
-                                 </Grid>
-                                 <Grid item xs={2}>
-                                 <Button aria-label="Decrease size" onClick={()=>handleSizeIncrease(1)}>
-                                        <SkipNextIcon />
-                                    </Button>
-                                 </Grid>
-                             </Grid>
-                         </Grid>
+                         <SliderWithButtons 
+                                xs={12}
+                                step={1}
+                                min={0}
+                                max={maxStep}
+                                value={step}
+                                handleSliderChange={handleStepChange}
+                                handleButtonPress={shiftFrame}
+                         />
+                         <SliderWithButtons 
+                                xs={12}
+                                step={1}
+                                min={10}
+                                max={100}
+                                value={dataLen}
+                                handleSliderChange={handleSizeChange}
+                                handleButtonPress={handleSizeIncrease}
+                         />
                      </Grid>
                      <Grid item xs={4} container alignContent="center">
                          <Grid item xs={12} container spacing={2}>
