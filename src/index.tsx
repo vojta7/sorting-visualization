@@ -352,7 +352,7 @@ function changeToAnimationFrame(idx: number, applicationData: ApplicationData, v
                 const animation = animations[i];
                 if (animation.Swap !== undefined) {
                     applySwap(animation.Swap[0], animation.Swap[1], newData)
-                } else if (animation.Compare !== null) {
+                } else if (animation.Compare !== undefined) {
                     lastCompare = animation.Compare
                 } else if (animation.Set !== undefined) {
                     newData[animation.Set[0]].value = animation.Set[1]
