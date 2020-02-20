@@ -376,7 +376,6 @@ function changeToAnimationFrame(idx: number, applicationData: ApplicationData, v
 }
 
 function applyCompare(idx1: number, idx2: number, data: BarChartData[]) {
-    console.log(`${idx1} ${idx2}`);
     data[idx1].color = BarColor.Compare;
     data[idx2].color = BarColor.Compare
 }
