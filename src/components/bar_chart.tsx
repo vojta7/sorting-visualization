@@ -1,9 +1,8 @@
-import React from 'react';
-import {makeStyles, createStyles} from '@material-ui/core/styles';
-import {Typography, Box, List, ListItem, ListItemText, Dialog, Fab} from '@material-ui/core';
+import React, {useState} from 'react';
+import {createStyles, makeStyles} from '@material-ui/core/styles';
+import {Box, Dialog, Fab, List, ListItem, ListItemText, Typography} from '@material-ui/core';
 import AddCircleIcon from '@material-ui/icons/AddCircle';
 import CloseIcon from '@material-ui/icons/Close';
-import {useState} from "react";
 import {Algorithm} from '../index'
 
 const barChartStyles = makeStyles(() => createStyles(

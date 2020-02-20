@@ -1,5 +1,5 @@
 import * as React from "react";
-import {Button, Typography, Slider, Grid} from '@material-ui/core';
+import {Button, Grid, Slider, Typography} from '@material-ui/core';
 import SkipNextIcon from '@material-ui/icons/SkipNext';
 import SkipPreviousIcon from '@material-ui/icons/SkipPrevious';
 

@@ -1,23 +1,23 @@
 import * as React from "react";
 import {useState} from "react";
 import * as ReactDOM from "react-dom";
-import {BarChartData, BarColor, BarChart} from "./components/bar_chart";
+import {BarChart, BarChartData, BarColor} from "./components/bar_chart";
 import {SliderWithButtons} from "./components/slider_with_buttons";
 import {PauseButton} from "./components/pause_button";
 import {
-    FormControlLabel,
-    Switch,
-    CssBaseline,
-    ThemeProvider,
-    Button,
-    Typography,
-    Slider,
-    Container,
     Box,
-    Grid
+    Button,
+    Container,
+    CssBaseline,
+    FormControlLabel,
+    Grid,
+    Slider,
+    Switch,
+    ThemeProvider,
+    Typography
 } from '@material-ui/core';
 import ReplayIcon from '@material-ui/icons/Replay';
-import {createMuiTheme, makeStyles, createStyles} from '@material-ui/core/styles';
+import {createMuiTheme, createStyles, makeStyles} from '@material-ui/core/styles';
 
 const darkTheme = createMuiTheme({
     palette: {
