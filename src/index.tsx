@@ -70,12 +70,18 @@ const AvailableAlghoritms: Map<Alghoritm, string> = new Map([
 
 type ApplicationData = ({algorithm: Alghoritm, data: BarChartData[], animations: Animation[]} | null)[]
 
+const minDataLen: number = 10;
+const maxDataLen: number = 100;
+
+const maxAnimationTimeout: number = 500;
+const minAnimationTimeout: number = 5;
+
 function App(props: {wasm: any}) {
     const [applicationData, setApplicationData] = useState<ApplicationData>([null, null]);
     const [values, setValues] = useState<number[]>([]);
     const [running, setRunning] = useState(false);
-    const [animationTimeout, setAnimationTimeout] = useState(500-100);
-    const [dataLen, setDataLen] = useState(10);
+    const [animationTimeout, setAnimationTimeout] = useState(maxAnimationTimeout-100);
+    const [dataLen, setDataLen] = useState(minDataLen);
     const [step, setStep] = useState(0);
     const [darkThemeOn, setDarkThemeOn] = useState(false);
     const classes = useStyles(darkTheme);
@@ -87,10 +93,21 @@ function App(props: {wasm: any}) {
     const handleThemeChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         setDarkThemeOn(event.target.checked)
     };
+    const dataLenRef = React.useRef(dataLen)
+    dataLenRef.current = dataLen
+    const handleSizeIncrease = (increase: number) => {
+        let newLen = dataLenRef.current + increase;
+        if (newLen <= maxDataLen && newLen >= minDataLen) {
+            setDataLen(newLen);
+            generateNewArray(newLen);
+        }
+    }
     const handleSizeChange = (_event: any, newValue: number | number[]) => {
         if (typeof(newValue) === "number" && newValue != dataLen) {
-            setDataLen(newValue);
-            generateNewArray(newValue);
+            if ( newValue <= maxDataLen && newValue >= minDataLen) {
+                setDataLen(newValue);
+                generateNewArray(newValue);
+            }
         }
     };
     const handleSpeedChange = (_event: any, newValue: number | number[]) => {
@@ -132,7 +149,7 @@ function App(props: {wasm: any}) {
         }
         setApplicationData(changeToAnimationFrame(stepRef.current, applicationDataRef.current, valuesRef.current))
         setStep(stepRef.current +1)
-        setTimeout(animate,500-animationTimeoutRef.current)
+        setTimeout(animate,maxAnimationTimeout-animationTimeoutRef.current)
     }
 
     const shiftFrame = (amount: number) => {
@@ -222,7 +239,7 @@ function App(props: {wasm: any}) {
                              <Grid item xs={1}><Typography variant="subtitle2">Size</Typography></Grid>
                              <Grid container item xs={10}>
                                  <Grid item xs={2}>
-                                 <Button aria-label="Increase size" onClick={()=>{/*TODO*/}} style={{float: "right"}}>
+                                 <Button aria-label="Increase size" onClick={()=>handleSizeIncrease(-1)} style={{float: "right"}}>
                                         <SkipPreviousIcon />
                                     </Button>
                                  </Grid>
@@ -238,7 +255,7 @@ function App(props: {wasm: any}) {
                                      />
                                  </Grid>
                                  <Grid item xs={2}>
-                                 <Button aria-label="Decrease size" onClick={()=>{/*TODO*/}}>
+                                 <Button aria-label="Decrease size" onClick={()=>handleSizeIncrease(1)}>
                                         <SkipNextIcon />
                                     </Button>
                                  </Grid>
@@ -256,7 +273,7 @@ function App(props: {wasm: any}) {
                                      value={animationTimeout}
                                      step={5}
                                      min={0}
-                                     max={495}
+                                     max={maxAnimationTimeout - minAnimationTimeout}
                                  />
                              </Grid>
                          </Grid>
