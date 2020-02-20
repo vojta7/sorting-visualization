@@ -69,7 +69,7 @@ const useStyles = makeStyles(() =>
 );
 
 export enum Algorithm {
-    Bouble,
+    Bubble,
     Quick,
     Heap,
     Merge,
@@ -82,7 +82,7 @@ const AvailableAlgorithms: Map<Algorithm, string> = new Map([
     [Algorithm.Merge, "Merge sort"],
     [Algorithm.Heap, "Heapsort"],
     [Algorithm.Heap2, "Heapsort (Floyd's heap construction)"],
-    [Algorithm.Bouble, "Bouble sort"],
+    [Algorithm.Bubble, "Bubble sort"],
     [Algorithm.Shake, "Shake sort"],
 ]);
 
@@ -314,8 +314,8 @@ function generateAnimations(data: number[], algorithm: Algorithm, functions: any
         case Algorithm.Merge: {
             return functions.merge_sort(arr) as Animation[]
         }
-        case Algorithm.Bouble: {
-            return functions.bouble_sort(arr) as Animation[]
+        case Algorithm.Bubble: {
+            return functions.bubble_sort(arr) as Animation[]
         }
         case Algorithm.Shake: {
             return functions.shake_sort(arr) as Animation[]

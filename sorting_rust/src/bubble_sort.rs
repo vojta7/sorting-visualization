@@ -1,13 +1,13 @@
 use crate::Animation;
 
-/// Basic bouble sort
+/// Basic bubble sort
 ///
 /// time: O(N^2)
 /// space: O(1)
 /// stable
 ///
 /// swipes from left to right, each time reducing legth by one
-pub fn bouble_sort_inner(array: &mut [i32], animations: &mut Vec<Animation>) {
+pub fn bubble_sort_inner(array: &mut [i32], animations: &mut Vec<Animation>) {
     for i in 1..(array.len()) {
         for j in 0..(array.len() - i) {
             animations.push(Animation::Compare(j,j+1));

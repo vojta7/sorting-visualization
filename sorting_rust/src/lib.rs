@@ -9,8 +9,8 @@ use serde::Serialize;
 #[global_allocator]
 static ALLOC: wee_alloc::WeeAlloc = wee_alloc::WeeAlloc::INIT;
 
-mod bouble_sort;
-use bouble_sort::*;
+mod bubble_sort;
+use bubble_sort::*;
 mod heap_sort;
 use heap_sort::*;
 mod quick_sort;
@@ -27,10 +27,10 @@ pub enum Animation {
 
 
 #[wasm_bindgen]
-pub fn bouble_sort(array: &[i32]) -> JsValue {
+pub fn bubble_sort(array: &[i32]) -> JsValue {
     let mut arr = array.to_owned();
     let mut animations = Vec::new();
-    bouble_sort_inner(&mut arr, &mut animations);
+    bubble_sort_inner(&mut arr, &mut animations);
     JsValue::from_serde(&animations).unwrap()
 }
 
@@ -84,10 +84,10 @@ pub fn init() {
 mod test {
     use super::*;
     #[test]
-    fn test_bouble_sort() {
+    fn test_bubble_sort() {
         let mut arr = [ 4, 5, 9, 1, 2, 4, 5, 7, 7, 1 ];
         let mut animations = Vec::new();
-        bouble_sort_inner(&mut arr, &mut animations);
+        bubble_sort_inner(&mut arr, &mut animations);
         assert_eq!(arr.as_ref(), [1,1,2,4,4,5,5,7,7,9]);
     }
     #[test]
