@@ -57,13 +57,13 @@ const useStyles = makeStyles(() =>
 
 export enum Alghoritm {
     Bouble,
-    //Quick,
+    Quick,
     Heap
 }
 
 const AvailableAlghoritms: Map<Alghoritm, string> = new Map([
     [Alghoritm.Bouble, "Bouble Sort"],
-    //[Alghoritm.Quick, "Quick Sort"],
+    [Alghoritm.Quick, "Quick Sort"],
     [Alghoritm.Heap, "Heap Sort"],
 ])
 
@@ -285,6 +285,9 @@ function generateAnimations(data: number[], alghoritm: Alghoritm, functions: any
     switch (alghoritm) {
         case Alghoritm.Heap: {
             return functions.heap_sort(arr) as Animation[]
+        }
+        case Alghoritm.Quick: {
+            return functions.quick_sort(arr) as Animation[]
         }
         case Alghoritm.Bouble: {
             return functions.bouble_sort(arr) as Animation[]

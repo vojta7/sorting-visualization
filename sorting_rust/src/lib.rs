@@ -82,6 +82,30 @@ fn bouble_down(arr: &mut[i32], idx: usize, animations: &mut Vec<Animation>) {
     }
 }
 
+fn quick_sort_inner(arr:&mut [i32], lo: usize, hi: usize, animations: &mut Vec<Animation>) {
+    if lo < hi {
+        let p = partition(arr, lo, hi, animations);
+        quick_sort_inner(arr,lo,std::cmp::max(1,p)-1,animations);
+        quick_sort_inner(arr,p + 1,hi,animations);
+    }
+}
+
+fn partition(arr:&mut [i32], lo: usize, hi: usize, animations: &mut Vec<Animation>) -> usize {
+    let pivot = arr[hi];
+    let mut i = lo;
+    for j in lo..=hi {
+        animations.push(Animation::Compare(j,hi));
+        if arr[j] < pivot {
+            animations.push(Animation::Swap(i,j));
+            arr.swap(i,j);
+            i = i+1;
+        }
+    }
+    animations.push(Animation::Swap(i,hi));
+    arr.swap(i,hi);
+    i
+}
+
 fn heap_sort_inner(arr:&mut [i32], animations: &mut Vec<Animation>) {
     for i in 1..arr.len() {
         bouble_up(&mut arr[..=i], animations);
@@ -101,6 +125,15 @@ pub fn heap_sort(array: &[i32]) -> JsValue {
     let mut arr = array.to_owned();
     let mut animations = Vec::new();
     heap_sort_inner(&mut arr, &mut animations);
+    JsValue::from_serde(&animations).unwrap()
+}
+
+#[wasm_bindgen]
+pub fn quick_sort(array: &[i32]) -> JsValue {
+    let mut arr = array.to_owned();
+    let mut animations = Vec::new();
+    let len = arr.len() -1;
+    quick_sort_inner(&mut arr, 0, len, &mut animations);
     JsValue::from_serde(&animations).unwrap()
 }
 
@@ -130,6 +163,14 @@ mod test {
         let mut arr = [ 4, 5, 9, 1, 2, 4, 5, 7, 7, 1 ];
         let mut animations = Vec::new();
         heap_sort_inner(&mut arr, &mut animations);
+        assert_eq!(arr.as_ref(), [1,1,2,4,4,5,5,7,7,9]);
+    }
+    #[test]
+    fn test_quick_sort() {
+        let mut arr = [ 4, 5, 9, 1, 2, 4, 5, 7, 7, 1 ];
+        let mut animations = Vec::new();
+        let len = arr.len() -1;
+        quick_sort_inner(&mut arr, 0, len, &mut animations);
         assert_eq!(arr.as_ref(), [1,1,2,4,4,5,5,7,7,9]);
     }
 }
