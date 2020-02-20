@@ -60,7 +60,8 @@ export enum Alghoritm {
     Bouble,
     Quick,
     Heap,
-    Merge
+    Merge,
+    Shake
 }
 
 const AvailableAlghoritms: Map<Alghoritm, string> = new Map([
@@ -68,6 +69,7 @@ const AvailableAlghoritms: Map<Alghoritm, string> = new Map([
     [Alghoritm.Quick, "Quick Sort"],
     [Alghoritm.Heap, "Heap Sort"],
     [Alghoritm.Merge, "Merge Sort"],
+    [Alghoritm.Shake, "Shake Sort"],
 ])
 
 type ApplicationData = ({algorithm: Alghoritm, data: BarChartData[], animations: Animation[]} | null)[]
@@ -297,6 +299,9 @@ function generateAnimations(data: number[], alghoritm: Alghoritm, functions: any
         }
         case Alghoritm.Bouble: {
             return functions.bouble_sort(arr) as Animation[]
+        }
+        case Alghoritm.Shake: {
+            return functions.shake_sort(arr) as Animation[]
         }
     }
 }
