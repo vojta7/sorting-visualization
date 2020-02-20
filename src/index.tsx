@@ -294,7 +294,7 @@ function App(props: { wasm: any }) {
 }
 
 function generateRandomArray(len: number, max: number): Array<number> {
-    const arr = new Array();
+    const arr = [];
     for (let i = 0; i < len; i++) {
         const n = Math.floor((Math.random() * max) + 1);
         arr.push(n)
@@ -336,7 +336,7 @@ function updateData(data: number[], oldApplicationData: ApplicationData, functio
         el.animations = generateAnimations(data, el.algorithm, functions)
     });
     return newBarChartData
-};
+}
 
 function changeToAnimationFrame(idx: number, applicationData: ApplicationData, values: number[]): ApplicationData {
     const newApplicationData = applicationData.slice();
@@ -345,31 +345,28 @@ function changeToAnimationFrame(idx: number, applicationData: ApplicationData, v
         const myIdx = Math.min(sort.animations.length - 1, idx);
         const animations = sort.animations;
         let resetColor = myIdx < idx || myIdx == sort.animations.length - 1 ? BarColor.Finished : BarColor.Normal;
-        const newData = values.map((v) => {
-            const p = {value: v, color: resetColor};
-            return p
-        });
+        const newData = values.map((v) => { return {value: v, color: resetColor}; });
         if (animations.length > 0) {
             let lastCompare = null;
             for (let i = 0; i < myIdx; i++) {
                 const animation = animations[i];
-                if (animation.Swap !== null) {
+                if (animation.Swap !== undefined) {
                     applySwap(animation.Swap[0], animation.Swap[1], newData)
                 } else if (animation.Compare !== null) {
                     lastCompare = animation.Compare
-                } else if (animation.Set !== null) {
+                } else if (animation.Set !== undefined) {
                     newData[animation.Set[0]].value = animation.Set[1]
                 }
             }
             const animation = animations[myIdx];
-            if (animation.Compare !== null && myIdx != sort.animations.length - 1) {
+            if (animation.Compare !== undefined && myIdx != sort.animations.length - 1) {
                 applyCompare(animation.Compare[0], animation.Compare[1], newData)
-            } else if (animation.Swap !== null) {
-                if (lastCompare !== null && myIdx != sort.animations.length - 1) {
+            } else if (animation.Swap !== undefined) {
+                if (lastCompare !== null && lastCompare !== undefined && myIdx != sort.animations.length - 1) {
                     applyCompare(lastCompare[0], lastCompare[1], newData)
                 }
                 applySwap(animation.Swap[0], animation.Swap[1], newData)
-            } else if (animation.Set !== null) {
+            } else if (animation.Set !== undefined) {
                 newData[animation.Set[0]].value = animation.Set[1]
             }
         }
