@@ -4,7 +4,7 @@ import {Typography, Box, List, ListItem, ListItemText, Dialog, Fab } from '@mate
 import AddCircleIcon from '@material-ui/icons/AddCircle';
 import CloseIcon from '@material-ui/icons/Close';
 import {useState} from "react";
-import {Alghoritm} from '../index'
+import {Algorithm} from '../index'
 
 const barChartStyles = makeStyles(()=> createStyles(
   {
@@ -60,8 +60,8 @@ export enum BarColor {
 export interface BarChartData { value: number,color: BarColor }
 export interface BarChartProps {
     data: BarChartData[] | null,
-    onSelect: (arg1: Alghoritm | null) => void,
-    alghoritms: Map<Alghoritm,string>,
+    onSelect: (arg1: Algorithm | null) => void,
+    algorithms: Map<Algorithm,string>,
     heading: string | undefined
 }
 
@@ -69,11 +69,11 @@ export function BarChart(props: BarChartProps) {
     if (props.data != null) {
         return (<BarChartInner data={props.data} onSelect={props.onSelect} heading={props.heading} />)
     } else {
-        return (<SelectSort onSelect={props.onSelect} alghoritms={props.alghoritms} />)
+        return (<SelectSort onSelect={props.onSelect} algorithms={props.algorithms} />)
     }
 }
 
-function SelectSort(props: {alghoritms: Map<Alghoritm,string>, onSelect: (arg1: Alghoritm | null) => void}) {
+function SelectSort(props: {algorithms: Map<Algorithm,string>, onSelect: (arg1: Algorithm | null) => void}) {
     const classes = barChartStyles();
     const [open, setOpen] = useState(false);
     const openAlgSelection = (_event: any) => {
@@ -83,7 +83,7 @@ function SelectSort(props: {alghoritms: Map<Alghoritm,string>, onSelect: (arg1: 
         <div className={classes.root}>
             <Dialog open={open} >
                 <List>
-                    {[...props.alghoritms].map(([al, name]) => (
+                    {[...props.algorithms].map(([al, name]) => (
                         <ListItem button key={al.toString()} onClick={()=>{
                             setOpen(false)
                             props.onSelect(al)
@@ -101,14 +101,14 @@ function SelectSort(props: {alghoritms: Map<Alghoritm,string>, onSelect: (arg1: 
 }
 
 
-function BarChartInner(props: {heading: string | undefined, data: BarChartData[], onSelect: (arg1: Alghoritm | null) => void}) {
+function BarChartInner(props: {heading: string | undefined, data: BarChartData[], onSelect: (arg1: Algorithm | null) => void}) {
     const classes = barChartStyles();
     const barHeightScale = 100 / Math.max.apply(Math, props.data.map(({value,}) => value))
     const barWidth = `${90 / props.data.length}%`
     const marginRight = `${10 / props.data.length}%`
         return (
           <div className={classes.root}>
-              <Fab className={classes.close} aria-label="remove alghoritm" onClick={() => props.onSelect(null)} >
+              <Fab className={classes.close} aria-label="remove algorithm" onClick={() => props.onSelect(null)} >
                 <CloseIcon fontSize="large" />
               </Fab>
               <Box height={1/4}>

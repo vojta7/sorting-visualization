@@ -4,6 +4,7 @@ import SkipNextIcon from '@material-ui/icons/SkipNext';
 import SkipPreviousIcon from '@material-ui/icons/SkipPrevious';
 
 export function SliderWithButtons(props: {
+    name: string,
     step: number
     min: number,
     max: number,
@@ -14,7 +15,7 @@ export function SliderWithButtons(props: {
 }) {
     return (
          <Grid item xs={props.xs} container spacing={2}>
-             <Grid item xs={1}><Typography variant="subtitle2">Size</Typography></Grid>
+             <Grid item xs={1}><Typography variant="subtitle2">{props.name}</Typography></Grid>
              <Grid container item xs={10}>
                  <Grid item xs={2}>
                  <Button aria-label="Increase size" onClick={()=>props.handleButtonPress(-1)} style={{float: "right"}}>

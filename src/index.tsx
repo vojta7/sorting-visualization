@@ -56,7 +56,7 @@ const useStyles = makeStyles(() =>
   }),
 );
 
-export enum Alghoritm {
+export enum Algorithm {
     Bouble,
     Quick,
     Heap,
@@ -65,16 +65,16 @@ export enum Alghoritm {
     Heap2,
 }
 
-const AvailableAlghoritms: Map<Alghoritm, string> = new Map([
-    [Alghoritm.Quick, "Quick Sort"],
-    [Alghoritm.Merge, "Merge Sort"],
-    [Alghoritm.Heap, "Heap Sort"],
-    [Alghoritm.Heap2, "Heap Sort (Floyd's heap construction)"],
-    [Alghoritm.Bouble, "Bouble Sort"],
-    [Alghoritm.Shake, "Shake Sort"],
+const AvailableAlgorithms: Map<Algorithm, string> = new Map([
+    [Algorithm.Quick, "Quick Sort"],
+    [Algorithm.Merge, "Merge Sort"],
+    [Algorithm.Heap, "Heap Sort"],
+    [Algorithm.Heap2, "Heap Sort (Floyd's heap construction)"],
+    [Algorithm.Bouble, "Bouble Sort"],
+    [Algorithm.Shake, "Shake Sort"],
 ])
 
-type ApplicationData = ({algorithm: Alghoritm, data: BarChartData[], animations: Animation[]} | null)[]
+type ApplicationData = ({algorithm: Algorithm, data: BarChartData[], animations: Animation[]} | null)[]
 
 const minDataLen: number = 10;
 const maxDataLen: number = 100;
@@ -178,7 +178,7 @@ function App(props: {wasm: any}) {
         setApplicationData(updateData(data, applicationData, props.wasm))
     }
 
-    const selectAlghoritm = (algorithm: Alghoritm | null, idx: number) => {
+    const selectAlgorithm = (algorithm: Algorithm | null, idx: number) => {
         let newData = applicationData.slice()
         if (algorithm === null) {
             newData[idx] = null;
@@ -202,7 +202,7 @@ function App(props: {wasm: any}) {
                  <Grid container spacing={2}>
                      <Grid item xs={2}/>
                      <Grid item xs={8}>
-                         <Typography variant="h3" component="h1" className={classes.heading}>Visualization of sorting alghoritms</Typography>
+                         <Typography variant="h3" component="h1" className={classes.heading}>Visualization of sorting algorithms</Typography>
                      </Grid>
                      <Grid item xs={2}>
                      <FormControlLabel
@@ -216,6 +216,7 @@ function App(props: {wasm: any}) {
                      <Grid item xs={1} />
                      <Grid item xs={6} container>
                          <SliderWithButtons 
+                                name="Steps"
                                 xs={12}
                                 step={1}
                                 min={0}
@@ -225,6 +226,7 @@ function App(props: {wasm: any}) {
                                 handleButtonPress={shiftFrame}
                          />
                          <SliderWithButtons 
+                                name="Size"
                                 xs={12}
                                 step={1}
                                 min={10}
@@ -267,9 +269,9 @@ function App(props: {wasm: any}) {
                 <Container className={classes.chart} maxWidth={false} key={idx}>
                 <BarChart
                     data={chartData != null ? chartData.data : null}
-                    alghoritms={AvailableAlghoritms}
-                    onSelect={(alghoritm)=>selectAlghoritm(alghoritm, idx)}
-                    heading={chartData != null ? AvailableAlghoritms.get(chartData.algorithm) : undefined}
+                    algorithms={AvailableAlgorithms}
+                    onSelect={(algorithm)=>selectAlgorithm(algorithm, idx)}
+                    heading={chartData != null ? AvailableAlgorithms.get(chartData.algorithm) : undefined}
                     />
                 </Container>
             ))}
@@ -287,25 +289,25 @@ function generateRandomArray(len: number, max: number): Array<number> {
     return arr
 }
 
-function generateAnimations(data: number[], alghoritm: Alghoritm, functions: any): Animation[] {
+function generateAnimations(data: number[], algorithm: Algorithm, functions: any): Animation[] {
     const arr = Int32Array.from(data)
-    switch (alghoritm) {
-        case Alghoritm.Heap: {
+    switch (algorithm) {
+        case Algorithm.Heap: {
             return functions.heap_sort(arr) as Animation[]
         }
-        case Alghoritm.Quick: {
+        case Algorithm.Quick: {
             return functions.quick_sort(arr) as Animation[]
         }
-        case Alghoritm.Merge: {
+        case Algorithm.Merge: {
             return functions.merge_sort(arr) as Animation[]
         }
-        case Alghoritm.Bouble: {
+        case Algorithm.Bouble: {
             return functions.bouble_sort(arr) as Animation[]
         }
-        case Alghoritm.Shake: {
+        case Algorithm.Shake: {
             return functions.shake_sort(arr) as Animation[]
         }
-        case Alghoritm.Heap2: {
+        case Algorithm.Heap2: {
             return functions.heap_sort2(arr) as Animation[]
         }
     }
