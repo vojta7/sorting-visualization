@@ -9,36 +9,37 @@ export function SliderWithButtons(props: {
     min: number,
     max: number,
     value: number,
-    xs: 1|2|3|4|5|6|7|9|10|11|12,
+    xs: 1 | 2 | 3 | 4 | 5 | 6 | 7 | 9 | 10 | 11 | 12,
     handleSliderChange: (arg1: any, arg2: number | number[]) => void,
     handleButtonPress: (arg1: number) => void
 }) {
     return (
-         <Grid item xs={props.xs} container spacing={2}>
-             <Grid item xs={1}><Typography variant="subtitle2">{props.name}</Typography></Grid>
-             <Grid container item xs={10}>
-                 <Grid item xs={2}>
-                 <Button aria-label="Increase size" onClick={()=>props.handleButtonPress(-1)} style={{float: "right"}}>
-                        <SkipPreviousIcon />
+        <Grid item xs={props.xs} container spacing={2}>
+            <Grid item xs={1}><Typography variant="subtitle2">{props.name}</Typography></Grid>
+            <Grid container item xs={10}>
+                <Grid item xs={2}>
+                    <Button aria-label="Increase size" onClick={() => props.handleButtonPress(-1)}
+                            style={{float: "right"}}>
+                        <SkipPreviousIcon/>
                     </Button>
-                 </Grid>
-                 <Grid item xs={8}>
-                     <Slider
-                         onChange={props.handleSliderChange}
-                         aria-labelledby="discrete-slider"
-                         valueLabelDisplay="auto"
-                         step={props.step}
-                         min={props.min}
-                         max={props.max}
-                         value={props.value}
-                     />
-                 </Grid>
-                 <Grid item xs={2}>
-                 <Button aria-label="Decrease size" onClick={()=>props.handleButtonPress(1)}>
-                        <SkipNextIcon />
+                </Grid>
+                <Grid item xs={8}>
+                    <Slider
+                        onChange={props.handleSliderChange}
+                        aria-labelledby="discrete-slider"
+                        valueLabelDisplay="auto"
+                        step={props.step}
+                        min={props.min}
+                        max={props.max}
+                        value={props.value}
+                    />
+                </Grid>
+                <Grid item xs={2}>
+                    <Button aria-label="Decrease size" onClick={() => props.handleButtonPress(1)}>
+                        <SkipNextIcon/>
                     </Button>
-                 </Grid>
-             </Grid>
-         </Grid>
+                </Grid>
+            </Grid>
+        </Grid>
     )
 }
