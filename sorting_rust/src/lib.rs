@@ -12,7 +12,8 @@ static ALLOC: wee_alloc::WeeAlloc = wee_alloc::WeeAlloc::INIT;
 #[derive(Serialize)]
 enum Animation {
     Compare(usize,usize),
-    Swap(usize,usize)
+    Swap(usize,usize),
+    Set(usize,i32),
 }
 
 
@@ -115,6 +116,45 @@ fn heap_sort_inner(arr:&mut [i32], animations: &mut Vec<Animation>) {
     }
 }
 
+fn merge_sort_inner(arr:&mut [i32], animations: &mut Vec<Animation>) {
+    let mut work_space = vec![0;arr.len()];
+    for (idx,&v) in arr.iter().enumerate() {
+        work_space[idx] = v;
+    }
+    split_merge(&mut work_space, arr, 0, animations);
+}
+
+fn split_merge(arr:&mut [i32], work_space:&mut [i32], offset: usize, animations: &mut Vec<Animation>) {
+    if arr.len() <= 1 {
+        return
+    }
+    let middle = arr.len() / 2;
+    split_merge(&mut work_space[..middle],&mut arr[..middle], offset, animations);
+    split_merge(&mut work_space[middle..],&mut arr[middle..], middle + offset, animations);
+    merge(arr, work_space, offset, animations);
+}
+
+fn merge(arr:&mut [i32], work_space:&mut [i32], offset: usize, animations: &mut Vec<Animation>) {
+    let end = work_space.len();
+    let middle = end / 2;
+    let mut i = 0;
+    let mut j = middle;
+
+    for k in 0..end {
+        if i<middle && (j >= end || arr[i] <= arr[j]) {
+            work_space[k] = arr[i];
+            animations.push(Animation::Compare(i,j));
+            animations.push(Animation::Set(k + offset,arr[i]));
+            i += 1;
+        } else {
+            work_space[k] = arr[j];
+            animations.push(Animation::Compare(i+offset,middle+offset));
+            animations.push(Animation::Set(k + offset,arr[j]));
+            j += 1;
+        }
+    }
+}
+
 #[wasm_bindgen]
 pub fn bouble_sort(array: &[i32]) -> JsValue {
     JsValue::from_serde(&bouble_sort_inner(array).1).unwrap()
@@ -134,6 +174,14 @@ pub fn quick_sort(array: &[i32]) -> JsValue {
     let mut animations = Vec::new();
     let len = arr.len() -1;
     quick_sort_inner(&mut arr, 0, len, &mut animations);
+    JsValue::from_serde(&animations).unwrap()
+}
+
+#[wasm_bindgen]
+pub fn merge_sort(array: &[i32]) -> JsValue {
+    let mut arr = array.to_owned();
+    let mut animations = Vec::new();
+    merge_sort_inner(&mut arr, &mut animations);
     JsValue::from_serde(&animations).unwrap()
 }
 
@@ -171,6 +219,13 @@ mod test {
         let mut animations = Vec::new();
         let len = arr.len() -1;
         quick_sort_inner(&mut arr, 0, len, &mut animations);
+        assert_eq!(arr.as_ref(), [1,1,2,4,4,5,5,7,7,9]);
+    }
+    #[test]
+    fn test_merge_sort() {
+        let mut arr = [ 4, 5, 9, 1, 2, 4, 5, 7, 7, 1 ];
+        let mut animations = Vec::new();
+        merge_sort_inner(&mut arr, &mut animations);
         assert_eq!(arr.as_ref(), [1,1,2,4,4,5,5,7,7,9]);
     }
 }

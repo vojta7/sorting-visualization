@@ -31,6 +31,7 @@ run()
 interface Animation {
     Swap?: [number, number]
     Compare?: [number, number]
+    Set?: [number, number]
 }
 
 const useStyles = makeStyles(() =>
@@ -58,13 +59,15 @@ const useStyles = makeStyles(() =>
 export enum Alghoritm {
     Bouble,
     Quick,
-    Heap
+    Heap,
+    Merge
 }
 
 const AvailableAlghoritms: Map<Alghoritm, string> = new Map([
     [Alghoritm.Bouble, "Bouble Sort"],
     [Alghoritm.Quick, "Quick Sort"],
     [Alghoritm.Heap, "Heap Sort"],
+    [Alghoritm.Merge, "Merge Sort"],
 ])
 
 type ApplicationData = ({algorithm: Alghoritm, data: BarChartData[], animations: Animation[]} | null)[]
@@ -289,6 +292,9 @@ function generateAnimations(data: number[], alghoritm: Alghoritm, functions: any
         case Alghoritm.Quick: {
             return functions.quick_sort(arr) as Animation[]
         }
+        case Alghoritm.Merge: {
+            return functions.merge_sort(arr) as Animation[]
+        }
         case Alghoritm.Bouble: {
             return functions.bouble_sort(arr) as Animation[]
         }
@@ -324,6 +330,8 @@ function changeToAnimationFrame(idx: number, applicationData: ApplicationData, v
                     applySwap(animation.Swap[0], animation.Swap[1], newData)
                 } else if (animation.Compare !=null) {
                     lastCompare = animation.Compare
+                } else if (animation.Set !=null) {
+                    newData[animation.Set[0]].value = animation.Set[1]
                 }
             }
             const animation = animations[myIdx]
@@ -334,6 +342,8 @@ function changeToAnimationFrame(idx: number, applicationData: ApplicationData, v
                     applyCompare(lastCompare[0], lastCompare[1], newData)
                 }
                 applySwap(animation.Swap[0], animation.Swap[1], newData)
+            } else if (animation.Set !=null) {
+                newData[animation.Set[0]].value = animation.Set[1]
             }
         }
         sort.data = newData
@@ -342,6 +352,7 @@ function changeToAnimationFrame(idx: number, applicationData: ApplicationData, v
 }
 
 function applyCompare(idx1: number, idx2: number, data: BarChartData[]) {
+    console.log(`${idx1} ${idx2}`)
     data[idx1].color = BarColor.Compare
     data[idx2].color = BarColor.Compare
 }
