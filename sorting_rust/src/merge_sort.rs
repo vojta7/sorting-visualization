@@ -29,12 +29,12 @@ fn merge(arr:&mut [i32], work_space:&mut [i32], offset: usize, animations: &mut 
     for k in 0..end {
         if i<middle && (j >= end || arr[i] <= arr[j]) {
             work_space[k] = arr[i];
-            animations.push(Animation::Compare(i,j));
+            animations.push(Animation::Compare(k + offset,i + offset));
             animations.push(Animation::Set(k + offset,arr[i]));
             i += 1;
         } else {
             work_space[k] = arr[j];
-            animations.push(Animation::Compare(i+offset,middle+offset));
+            animations.push(Animation::Compare(k+offset,j+offset));
             animations.push(Animation::Set(k + offset,arr[j]));
             j += 1;
         }

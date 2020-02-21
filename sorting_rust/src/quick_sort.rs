@@ -12,7 +12,7 @@ fn partition(arr:&mut [i32], lo: usize, hi: usize, animations: &mut Vec<Animatio
     let pivot = arr[hi];
     let mut i = lo;
     for j in lo..=hi {
-        animations.push(Animation::Compare(j,hi));
+        animations.push(Animation::Compare(i,j));
         if arr[j] < pivot {
             animations.push(Animation::Swap(i,j));
             arr.swap(i,j);
